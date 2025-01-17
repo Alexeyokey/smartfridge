@@ -38,6 +38,7 @@ class Scaner(Model):
         return check_password_hash
 
 
+
 class Product(Model):
     id = PrimaryKeyField()
     name = CharField()
@@ -60,4 +61,9 @@ class ShoppingListHistory(Model):
         database = db
 
 
-db.create_tables([Store, Scaner, Product, ShoppingListHistory, Ingredient])
+# db.create_tables([Store, Scaner, Product, ShoppingListHistory])
+for obj in Product.select():
+    print(obj.name)
+    # print(i)
+    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
+# print(products, then)

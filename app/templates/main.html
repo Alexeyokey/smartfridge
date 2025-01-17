@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Главная страница</title>
-  </head>
-  <body>
-    Привет
-  </body>
-</html>
+<form method="GET">
+  {{ form.hidden_tag() }}
+  {{ form.query(size=20, placeholder="Введите название...") }}
+  {{ form.submit() }}
+</form>
+
+<table border="1">
+  <tr>
+      <th>ID</th>
+      <th>Название</th>
+      <th>Количество</th>
+      <th>Дата</th>
+  </tr>
+  {% for row in table %}
+  <tr>
+      <td>{{ row.id }}</td>
+      <td>{{ row.name }}</td>
+      <td>{{ row.count }}</td>
+      <td>{{ row.data }}</td>
+  </tr>
+  {% endfor %}
+</table>
