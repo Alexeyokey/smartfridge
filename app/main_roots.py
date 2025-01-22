@@ -14,7 +14,8 @@ class SearchForm(FlaskForm):
 @main.route('/', methods=['GET', "POST"])
 def index():
     form = SearchForm()
-    table = [{'id': 111, 'name': 'ggg', 'count': 12, 'data': '12.04.2022'}, {'id': 2, 'name': 'Banana', 'count': 10, 'data': '12.04.2025'}]
+    table = requests.get('http://127.0.0.1:5000/api/products/1').json()['products']
+    print(table)
     # if request.method == "GET":
     query = request.args.get('query', '').strip().lower()
 
@@ -24,7 +25,7 @@ def index():
         # return render_template('index.html', table=table, form=form)
     
 
-    return render_template('index.html', table=table, form=form)
+    return render_template('main.html', table=table, form=form)
 
 @main.route('/generate_qr/<int:product_id>', methods=['GET', "POST"])
 def generate_qr(product_id):
@@ -46,6 +47,10 @@ def product(product_id):
 @main.route('/scan', methods=['GET'])
 def scan():
     return render_template('qrscan.html')
+
+@main.route('/base', methods=['GET'])
+def base():
+    return render_template('base.html')
 
 # @main.route('/qrprint', methods=['GET'])
 # def qrprint():

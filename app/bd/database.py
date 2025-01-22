@@ -36,7 +36,7 @@ class Product(Model):
     discount_percent = IntegerField()
     ingredients = CharField()
     allergic = BooleanField()
-    prduced_date = DateTimeField()
+    produced_date = DateTimeField()
     last_date = DateTimeField()
     # store = ForeignKeyField(Store, to_field='id')
 

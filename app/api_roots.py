@@ -23,12 +23,19 @@ def get_product(id):
 
 @api.route('/product/<int:id>', methods=['DELETE']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
 def delete(id):
-    # print('8888')
     print(id)
     product = Product.get(Product.id == str(id))
     product.delete_instance()
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     return jsonify({'msg': 'deleted'})
+
+@api.route('/add_product/', methods=['POST']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
+def add_product(product_inf):
+    # print(id)
+    Product.create(*product_inf)
+    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
+    return jsonify({'msg': 'added'})
+
 
 @api.route('/history/<int:page>', methods=['GET'])
 def get_shopping_history(page):
