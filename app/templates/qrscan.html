@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e8edf1;
+        }
+
+        .scanner {
+            width: 300px;
+            height: 500px;
+            background-color: #f0f3f7;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .scanner .scan-area {
+            width: 200px;
+            height: 200px;
+            background-color: #4b4f56;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        .scanner .scan-area::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border: 2px solid #b2d4e8;
+            border-radius: 5px;
+        }
+
+        .scanner .scan-area span {
+            position: absolute;
+            bottom: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .scanner .button {
+            width: 50px;
+            height: 50px;
+            background-color: #8ec3d9;
+            border-radius: 50%;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .scanner .button:active {
+            background-color: #72a7c0;
+        }
+
+        .back-button, .menu-button {
+            position: absolute;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(200, 230, 240, 0.8);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4b4f56;
+            cursor: pointer;
+        }
+
+        .back-button {
+            left: 20px;
+        }
+
+        .menu-button {
+            right: 20px;
+        }
+
+        .back-button:hover, .menu-button:hover {
+            background-color: #c3e2ef;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/schmich/instascan-builds@master/instascan.min.js"></script>
+</head>
+<body>
+    <div class="scanner">
+        <div class="back-button">&larr;</div>
+        <div class="menu-button">&#9776;</div>
+        <div class="scan-area">
+            <video id="preview">scan</video>
+        </div>
+        <p id="result">.....</p>
+        <button class="button"></button>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+
+          scanner.addListener('scan', function (content) {
+              document.getElementById('result').innerText = "Сканировано: " + content;
+              console.log('scan');
+              window.location.href = content; // Автопереход на страницу
+          });
+
+          Instascan.Camera.getCameras().then(function (cameras) {
+              if (cameras.length > 0) {
+                  // Если доступна задняя камера, используем её
+                  let selectedCamera = cameras.find(cam => cam.name.toLowerCase().includes('back')) || cameras[0];
+                  scanner.start(selectedCamera);
+              } else {
+                  alert("Камера не найдена");
+              }
+          }).catch(function (e) {
+              console.error("Ошибка доступа к камере:", e);
+              alert("Ошибка доступа к камере: " + e.message);
+          });
+      });
+  </script>
+</body>
+</html>

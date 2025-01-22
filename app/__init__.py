@@ -1,7 +1,7 @@
 from flask import Flask
 
 # from app.bd import bd_session
-
+# инициализация приложения, импортирование рутов и конфигов
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile('../config.py')

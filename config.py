@@ -1,3 +1,3 @@
 MYSQL_URL = 'sqlite://bd.db'
-SECRET_KEY = "secret"
+SECRET_KEY = "honestsecret"
 
