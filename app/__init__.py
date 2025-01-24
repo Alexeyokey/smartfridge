@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_socketio import SocketIO
 from .setting_param import PORT, COUNT_PAGE
+from .forms import *
 # from app.bd import bd_session
 # инициализация приложения, импортирование рутов и конфигов
 socketio = SocketIO(cors_allowed_origins="*")  # Разрешаем CORS для всех

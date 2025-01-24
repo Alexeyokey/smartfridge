@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function showNotification(message) {
         console.log("📢 Запрос на уведомление:", message);
         if (Notification.permission === "granted") {
-            new Notification("Новое уведомление", {
+            new Notification("SmartFrige", {
                 body: message,
-                icon: "/static/images/notification_icon.png",
+                icon: "/static/images/image.png",
             });
         }
     }

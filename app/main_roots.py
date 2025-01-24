@@ -7,17 +7,15 @@ import requests
 from app import PORT
 from app.bd.database import Product
 from app.bd.database import QR
+from .forms import addqrform
+from .forms import searchform
 
 # from app.bd.database import Product
 main = Blueprint('main', __name__, template_folder="templates")
 
-class SearchForm(FlaskForm):
-    query = StringField('SEARCH', validators=[Optional()] )
-    submit = SubmitField(('ПОИСК'))
-
 @main.route('/', methods=['GET', "POST"])
 def index():
-    form = SearchForm()
+    form = searchform.SearchForm()
     table = requests.get(f'http://127.0.0.1:{PORT}/api/products/1').json()['products']
     # print(table)
     # if request.method == "GET":
@@ -48,21 +46,14 @@ def product(product_id):
         # print(product_json.json())
         return render_template('product.html', products=product_json.json()['products'])
 
-class AddQRForm(FlaskForm):
-    product = SelectField('Product', choices=[], coerce=int, validators=[DataRequired()])
-    count = IntegerField('Count', validators=[DataRequired(), NumberRange(min=1)])
-    price = IntegerField('Price', validators=[DataRequired(), NumberRange(min=0)])
-    discount_percent = IntegerField('Discount Percent', validators=[NumberRange(min=0, max=100)])
-    produced_date = DateTimeField('Produced Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
-    last_date = DateTimeField('Last Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
-    submit = SubmitField('Add Product')
+
 
 products = [(1, 'Product 1'), (2, 'Product 2'), (3, 'Product 3')]  # Заглушка
 
 
 @main.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    form = AddQRForm()
+    form = addqrform.AddQRForm()
     # Устанавливаем choices для SelectField из базы данных (или списка продуктов)
     form.product.choices = products
     

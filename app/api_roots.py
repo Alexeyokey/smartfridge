@@ -12,7 +12,7 @@ def test():
 
 
 @api.route('/products/<int:page>', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
-def get_products(page):
+def get_products_limit(page):
     products = QR.select().where(QR.id > (page - 1) * COUNT_PAGE).order_by(QR.last_date).limit(COUNT_PAGE)
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     expired_products = {}
@@ -21,14 +21,26 @@ def get_products(page):
             expired_products[obj.id] = True 
         else:
             expired_products[obj.id] = False
-    print(expired_products)
-    # return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 
-    #                               'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 
-    #                               'last_date': obj.last_date, 'expired': expired_products[obj.id]} ]})
-
-
-    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
+
+@api.route('/products/', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
+def get_products():
+    products = QR.select().order_by(QR.last_date)
+    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
+    expired_products = {}
+    for obj in products:
+        if datetime.now() > obj.last_date:
+            expired_products[obj.id] = True 
+        else:
+            expired_products[obj.id] = False
+    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
+
+@api.route('/expired_count', methods=['GET'])
+def expired_count():
+    count = QR.select().where(QR.last_date < datetime.now()).count()
+    # select COUNT* from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
+    return jsonify({'count': count})
+
 
 @api.route('/product/<int:id>', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
 def get_product(id):

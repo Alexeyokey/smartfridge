@@ -2,6 +2,7 @@ from app import create_app
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import eventlet
+from app import PORT
 
 eventlet.monkey_patch()
 app = create_app()
@@ -20,11 +21,12 @@ def handle_disconnect():
 
 @socketio.on('notification')
 def send_notification():
-
+    # products
     """Функция для отправки уведомления"""
+    count = requests.get(f'http://127.0.0.1:{PORT}/api/expired_count').json()
     now = datetime.datetime.now().strftime('%H:%M:%S')
-    message = f"Новое уведомление! Время: {now}"
-    print(message)
+    message = f"ИСПОРЧЕНО ПРОДУКТОВ: {count['count']} ПРОВЕДИТЕ РЕВИЗИЮ"
+    # print(products)
     socketio.emit('notification', {'message': message})
 
 
