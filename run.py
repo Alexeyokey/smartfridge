@@ -1,6 +1,36 @@
 from app import create_app
+from apscheduler.schedulers.background import BackgroundScheduler
+import requests
+import eventlet
 
+eventlet.monkey_patch()
 app = create_app()
 
+
+from app import socketio
+import datetime
+
+@socketio.on('connect')
+def handle_connect():
+    print("Клиент подключен!")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print("Клиент отключился!")
+
+@socketio.on('notification')
+def send_notification():
+
+    """Функция для отправки уведомления"""
+    now = datetime.datetime.now().strftime('%H:%M:%S')
+    message = f"Новое уведомление! Время: {now}"
+    print(message)
+    socketio.emit('notification', {'message': message})
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(send_notification, 'interval', minutes=0.1)
+scheduler.start()
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True, host="0.0.0.0", port=5001, allow_unsafe_werkzeug=True)

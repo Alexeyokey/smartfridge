@@ -1,0 +1,2 @@
+COUNT_PAGE = 10
+PORT = 5001

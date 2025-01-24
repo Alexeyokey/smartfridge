@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shopping List</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Ingredients</th>
+                <th>Allergic</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <script>
+        // Example of fetching data dynamically using JavaScript (optional)
+        // You can replace this with server-side rendering for production
+        async function fetchProducts() {
+            const response = await fetch('/api//history/1'); // Replace with your API endpoint
+            const products = await response.json();
+            const tbody = document.querySelector('tbody');
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.type}</td>
+                    <td>${product.ingredients}</td>
+                    <td>${product.allergic ? 'Yes' : 'No'}</td>
+                    <td>
+                        ${<form action="/delete/{{ product.id }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>}
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+        fetchProducts();
+    </script>
+</body>
+</html>

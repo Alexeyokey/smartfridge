@@ -1,26 +1,49 @@
 {% extends "base.html" %} 
  
 {% block content %} 
+<form method="GET" class="searchform">
+    {{ form.hidden_tag() }}
+    {{ form.query(size=20, placeholder="Введите название...") }}
+    {{ form.submit() }}
+  </form>
     <div class = "table2" style="overflow: hidden;"> 
     <table class="table22" style="border-collapse: separate; border-spacing: 0;"> 
+       
         <thead> 
+            
             <tr class="tr2"> 
             <th class="th2">ID</th> 
             <th class="th3">Название</th> 
+            <th class="th3">Тип</th> 
             <th class="th3">Количество</th> 
             <th class="th3"> Дата</th> 
             <th class="th4">Срок годности</th> 
             </tr> 
         </thead> 
         <tbody>  
-            {% for row in table %} 
+            {% for row in table %}
+            {% if row.expired  %} 
+            <tr > 
+                <td style='background-color: crimson;'>{{ row.id }}</td> 
+                <td style='background-color: crimson;'>{{ row.name }}</td> 
+                <td style='background-color: crimson;'>{{ row.type }}</td> 
+                <td style='background-color: crimson;'>{{ row.count }}</td> 
+                <td style='background-color: crimson;'>{{ row.produced_date }}</td> 
+                <td style='background-color: crimson;'>{{ row.last_date }}</td> 
+                
+            </tr> 
+            {% else %}
             <tr> 
                 <td>{{ row.id }}</td> 
                 <td>{{ row.name }}</td> 
+                <td>{{ row.type }}</td> 
                 <td>{{ row.count }}</td> 
                 <td>{{ row.produced_date }}</td> 
                 <td>{{ row.last_date }}</td> 
+                
             </tr> 
+            {% endif %}
+
             {% endfor %} 
         </tbody> 
         </table> 

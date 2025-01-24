@@ -1,1 +1,0 @@
-COUNT_PAGE = 10

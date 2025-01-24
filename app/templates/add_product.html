@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 15px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Product</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <label for="product">{{ form.product.label }}</label>
+        {{ form.product(id="product") }}
+
+        <label for="count">{{ form.count.label }}</label>
+        {{ form.count(id="count") }}
+
+        <label for="price">{{ form.price.label }}</label>
+        {{ form.price(id="price") }}
+
+        <label for="discount_percent">{{ form.discount_percent.label }}</label>
+        {{ form.discount_percent(id="discount_percent") }}
+
+        <label for="produced_date">{{ form.produced_date.label }}</label>
+        {{ form.produced_date(id="produced_date") }}
+
+        <label for="last_date">{{ form.last_date.label }}</label>
+        {{ form.last_date(id="last_date") }}
+       <p>{{ form.submit(type="submit") }}</p> 
+        <!-- <button type="submit"></button> -->
+        
+    </form>
+</body>
+</html>
