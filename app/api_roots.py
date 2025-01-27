@@ -1,9 +1,11 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from datetime import timedelta, datetime
 from app import COUNT_PAGE
-
+import requests
 from app.bd.database import Product
 from app.bd.database import QR
+from app.bd.database import Fridge
+
 api = Blueprint('api', __name__, template_folder="templates")
 
 @api.route('/product', methods=['GET'])
@@ -54,9 +56,19 @@ def delete(id):
     return jsonify({'msg': 'deleted'})
 
 @api.route('/add_qr_product', methods=['POST']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
-def add_qr_product(product_inf):
-    # print(id)
-    QR.create(*product_inf)
+def add_qr_product():
+    print('!!!!!')
+    # print(request.json.keys())
+    qr_id = request.json.get('qr_id')
+    data = {
+            'product': qr_id
+        }
+    Fridge.create(**data)
+    # print(qr_id)
+    # product = request.json.get('product')
+    # product = request.json.get('product')
+    # print(product.json())
+    # QR.create(*product_inf)
     return jsonify({'msg': 'added'})
 
 

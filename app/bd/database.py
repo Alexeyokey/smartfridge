@@ -27,7 +27,6 @@ db = MySQLDatabase('fridge', host='127.0.0.1', port=3306, user='root', password=
 # # таблциа каждого уникального холодильника, каждый холодильник имеет свой код доступа и привязку к магазину 
 
 
-
 class Product(Model):
     id = PrimaryKeyField()
     name = CharField()
@@ -53,7 +52,7 @@ class QR(Model):
 class Fridge(Model):
     id = PrimaryKeyField() 
     product = ForeignKeyField(QR, to_field='id')
-    count = IntegerField()
+    # count = IntegerField()
     class Meta:
         database = db
     

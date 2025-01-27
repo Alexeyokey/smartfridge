@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, send_file
+from flask import Blueprint, render_template, request, send_file, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, IntegerField, DateTimeField
 from wtforms.validators import Optional, DataRequired, NumberRange
@@ -9,6 +9,7 @@ from app.bd.database import Product
 from app.bd.database import QR
 from .forms import addqrform
 from .forms import searchform, addform
+from .generate_qr import get_qrcode 
 
 # from app.bd.database import Product
 main = Blueprint('main', __name__, template_folder="templates")
@@ -31,12 +32,9 @@ def index():
 
 @main.route('/generate_qr/<int:product_id>', methods=['GET', "POST"])
 def generate_qr(product_id):
-    url = f'http://127.0.0.1:{PORT}/product/{product_id}'
-    qr = qrcode.make(url)
-    img_io = io.BytesIO()
-    qr.save(img_io, 'PNG')
-    img_io.seek(0)
-    return send_file(img_io, mimetype='scripts/images/PNG')
+    get_qrcode(product_id)
+    product = requests.get(f'http://127.0.0.1:{PORT}/product/{product_id}').json()
+    return render_template('qr_code.html', product=product, product_id = product_id, url_product = url_for('static', filename=f'qr_codes/qr_{product_id}.png'))
 
 
 @main.route('/product/<int:product_id>', methods=['GET'])
@@ -47,13 +45,10 @@ def product(product_id):
         return render_template('product.html', products=product_json.json()['products'])
 
 
-
-# products = [(1, 'Product 1'), (2, 'Product 2'), (3, 'Product 3')]  # Заглушка
 types = ['Snack', 'healthy']
 @main.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     form = addform.AddForm()
-    # Устанавливаем choices для SelectField из базы данных (или списка продуктов)
     form.type.choices = types
     if form.validate_on_submit():
         # Сохранение данных из формы в базу данных
@@ -96,11 +91,13 @@ def add_qr_product():
             'produced_date': form.produced_date.data,
             'last_date': form.last_date.data
         }
-        # print(data)
-        QR.create(**data)
-        # Здесь добавьте логику сохранения в базу данных
-        # print(f"Saving data: {data}")
-        return "Product added successfully!"
+        qr_code = QR.create(**data)
+        # print(qr_code.id)
+        # render_template('qr_code.html', qr_id=qr_code.id, data=data)
+        get_qrcode(qr_code.id)
+        product = requests.get(f'http://127.0.0.1:{PORT}/api/product/{qr_code.id}').json()
+        return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))
+
 
     return render_template('add_qr_product.html', form=form)
     
