@@ -11,8 +11,8 @@ def test():
     return jsonify({'message': "API is working!"})
 
 
-@api.route('/products/<int:page>', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
-def get_products_limit(page):
+@api.route('/qr_products/<int:page>', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
+def get_qr_products_limit(page):
     products = QR.select().where(QR.id > (page - 1) * COUNT_PAGE).order_by(QR.last_date).limit(COUNT_PAGE)
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     expired_products = {}
@@ -25,15 +25,12 @@ def get_products_limit(page):
 
 @api.route('/products/', methods=['GET']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
 def get_products():
-    products = QR.select().order_by(QR.last_date)
+    products = Product.select()
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
-    expired_products = {}
-    for obj in products:
-        if datetime.now() > obj.last_date:
-            expired_products[obj.id] = True 
-        else:
-            expired_products[obj.id] = False
-    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
+    # print(products)
+    # for i in products:
+    #     products(i.product.name)
+    return jsonify({'products': [{'id': obj.id, 'name': obj.name, 'type': obj.type, 'ingredients': obj.ingredients, 'allergic': obj.allergic} for obj in products]})
 
 @api.route('/expired_count', methods=['GET'])
 def expired_count():
@@ -56,8 +53,8 @@ def delete(id):
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     return jsonify({'msg': 'deleted'})
 
-@api.route('/add_product', methods=['POST']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
-def add_product(product_inf):
+@api.route('/add_qr_product', methods=['POST']) # тестрирование апи на работоспособность, отправка ограниченного количества продуктов на стриницу
+def add_qr_product(product_inf):
     # print(id)
     QR.create(*product_inf)
     return jsonify({'msg': 'added'})

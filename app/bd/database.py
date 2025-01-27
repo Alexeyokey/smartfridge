@@ -62,6 +62,7 @@ class Fridge(Model):
 class ShoppingListHistory(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
+    quantity = IntegerField()
     # scaner = ForeignKeyField(Scaner, to_field='id')
     
     class Meta:
@@ -81,19 +82,19 @@ sample_products = [
 
 # Insert sample objects into the database
 # print(sample_products)
-for product in sample_products:
-    Product.create(**product)
+# for product in sample_products:
+#     Product.create(**product)
 
 # print(datetime.now())
-for product in [1, 2, 3]:
-    QR.create(
-        product=product,
-        price=1000,  # Example price
-        count=product * 10,
-        discount_percent=10,  # Example discount percent
-        produced_date=datetime.now() - 2 * timedelta(days=product * 10),
-        last_date=datetime.now() - timedelta(days=product * 30),
-    )
+# for product in [1, 2, 3]:
+#     QR.create(
+#         product=product,
+#         price=1000,  # Example price
+#         count=product * 10,
+#         discount_percent=10,  # Example discount percent
+#         produced_date=datetime.now() - 2 * timedelta(days=product * 10),
+#         last_date=datetime.now() - timedelta(days=product * 30),
+#     )
 
 # qr_product = QR.select().where(QR.id == '1').get()
 # print(qr_product.product.name)

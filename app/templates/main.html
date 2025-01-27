@@ -23,24 +23,27 @@
         <tbody>  
             {% for row in table %}
             {% if row.expired  %} 
-            <tr > 
-                <td style='background-color: crimson;'>{{ row.id }}</td> 
-                <td style='background-color: crimson;'>{{ row.name }}</td> 
-                <td style='background-color: crimson;'>{{ row.type }}</td> 
-                <td style='background-color: crimson;'>{{ row.count }}</td> 
-                <td style='background-color: crimson;'>{{ row.produced_date }}</td> 
-                <td style='background-color: crimson;'>{{ row.last_date }}</td> 
+           
+            <tr> 
                 
+                <td style='background-color: rgb(180, 98, 114);'> <a href="http://0.0.0.0:5001/product/{{ row.id }}">{{ row.id }}</a></td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ row.name }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ row.type }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ row.count }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ row.produced_date }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ row.last_date }}</td> 
+            
             </tr> 
+        
             {% else %}
             <tr> 
-                <td>{{ row.id }}</td> 
+                
+                <td><a href="http://0.0.0.0:5001/product/{{ row.id }}">{{ row.id }}</a></td> 
                 <td>{{ row.name }}</td> 
                 <td>{{ row.type }}</td> 
                 <td>{{ row.count }}</td> 
                 <td>{{ row.produced_date }}</td> 
-                <td>{{ row.last_date }}</td> 
-                
+                <td>{{ row.last_date }}</td>        
             </tr> 
             {% endif %}
 

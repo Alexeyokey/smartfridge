@@ -8,7 +8,7 @@ from app import PORT
 from app.bd.database import Product
 from app.bd.database import QR
 from .forms import addqrform
-from .forms import searchform
+from .forms import searchform, addform
 
 # from app.bd.database import Product
 main = Blueprint('main', __name__, template_folder="templates")
@@ -16,7 +16,7 @@ main = Blueprint('main', __name__, template_folder="templates")
 @main.route('/', methods=['GET', "POST"])
 def index():
     form = searchform.SearchForm()
-    table = requests.get(f'http://127.0.0.1:{PORT}/api/products/1').json()['products']
+    table = requests.get(f'http://127.0.0.1:{PORT}/api/qr_products/1').json()['products']
     # print(table)
     # if request.method == "GET":
     query = request.args.get('query', '').strip().lower()
@@ -48,18 +48,45 @@ def product(product_id):
 
 
 
-products = [(1, 'Product 1'), (2, 'Product 2'), (3, 'Product 3')]  # Заглушка
-
-
+# products = [(1, 'Product 1'), (2, 'Product 2'), (3, 'Product 3')]  # Заглушка
+types = ['Snack', 'healthy']
 @main.route('/add_product', methods=['GET', 'POST'])
 def add_product():
+    form = addform.AddForm()
+    # Устанавливаем choices для SelectField из базы данных (или списка продуктов)
+    form.type.choices = types
+    if form.validate_on_submit():
+        # Сохранение данных из формы в базу данных
+        data = {
+            'name': form.name.data,
+            'type': form.type.data,
+            'ingredients': form.ingredients.data,
+            'allergic': form.allergic.data,
+        }
+        # print(data)
+        Product.create(**data)
+        # Здесь добавьте логику сохранения в базу данных
+        # print(f"Saving data: {data}")
+        return "Product added successfully!"
+
+    return render_template('add_product.html', form=form)
+
+
+@main.route('/add_qr_product', methods=['GET', 'POST'])
+def add_qr_product():
     form = addqrform.AddQRForm()
     # Устанавливаем choices для SelectField из базы данных (или списка продуктов)
+    # form.product.choices = products
+    json_products = requests.get(f'http://127.0.0.1:{PORT}/api/products').json()
+    products = []
+    k = 0
+    for i in json_products['products']:
+        k += 1
+        products.append((k, i['name']))
+    # print(products)
     form.product.choices = products
-    
-    # print(form.submit())
-    # print(form.errors)
-    if form.validate_on_submit() or request.method == "POST":
+    # print(requests.get(f'http://127.0.0.1:{PORT}/api/products').json())
+    if form.validate_on_submit():
         # Сохранение данных из формы в базу данных
         data = {
             'product': form.product.data,
@@ -69,13 +96,13 @@ def add_product():
             'produced_date': form.produced_date.data,
             'last_date': form.last_date.data
         }
-        print(data)
-        # QR.create(data[0])
+        # print(data)
+        QR.create(**data)
         # Здесь добавьте логику сохранения в базу данных
         # print(f"Saving data: {data}")
         return "Product added successfully!"
 
-    return render_template('add_product.html', form=form)
+    return render_template('add_qr_product.html', form=form)
     
 @main.route('/shopping_list/<int:page>', methods=['GET'])
 def shopping_list(page):
