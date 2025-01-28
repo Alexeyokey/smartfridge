@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="main.css" rel="stylesheet">
+        <link href="page1FR.css" rel="stylesheet">
+        
+        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" /> 
+        <link href="{{ url_for('static', filename='css/page1FR.css') }}" rel="stylesheet" /> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
+        <meta charset="utf-8">
+        <title>{{ title }}</title>
+    </head>
+    <body>
+       <header>
+        <div class="div1">
+          <div class="v4_73"><div class="v4_15"></div><div class="v4_16"></div><div class="v4_17"></div><div class="v4_18"></div><div class="v4_20"></div><div class="v4_21"></div><div class="v4_23"></div><div class="v4_24"></div><div class="v4_72"><div class="v4_25"></div><div class="v4_168"><div class="v4_27"></div><div class="v4_31"></div><div class="v4_29"></div><div class="v4_26"></div><div class="v4_35"></div><div class="v4_38"></div><div class="v4_36"></div><div class="v4_46"><div class="v4_47"></div><div class="v4_48"></div></div></div></div></div>
+          <p  class="v4_175">
+            QR<br>
+            fridgee
+        </p>
+        </div>
+
+        <nav>
+          <div class="dropdown">
+            <a class="button" class="v4_169"><div class="v4_4"></div><div class="v4_6"></div><div class="v4_9"></div><div class="v4_172"></div></a>
+            <div class="dropdown-content">
+              <a href="#" class="a1">Аналитика</a>
+              <a href="#" class="a2">Список покупок</a>
+            </div>
+          </div>
+        
+
+      </nav>
+        <!-- </div> -->
+        <!-- <form>
+            <label for="fruits">Выберите фрукт:</label>
+            <select id="fruits" name="fruits">
+              <option value="apple">Яблоко</option>
+              <option value="banana">Банан</option>
+              <option value="orange">Апельсин</option>
+            </select>
+          </form>           -->
+
+          
+      
+       </header>
+
+       
+    <form> 
+      <input type="text" placeholder="Искать здесь..."> 
+      <input type="submit"></input> 
+  </form>
+
+
+       <div id="notifications"></div>
+
+    <script>
+        const eventSource = new EventSource("/stream");
+
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const div = document.getElementById("notifications");
+            div.innerHTML += `<p>${data.message}</p>`;
+        };
+    </script>
+       {% block content %}{% endblock %}
+       <footer>
+        <div class="footer">
+            <a href="/scan">
+            <button class="v4_208"><div class="v4_203"></div><div class="v4_204"></div><div class="v4_207"></div><div class="v4_210"></div></button>
+            </a>
+            <a href="/generate_qr">
+                <button class="v90_45"><div class="v90_42"></div><div class="v90_43"></div><div class="v90_58"></div><div class="v90_36"></div></button>
+            </a>
+            <p></p>
+          </div>
+    
+       </footer>
+    </body>
+</html>
