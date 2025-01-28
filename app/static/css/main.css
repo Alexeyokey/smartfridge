@@ -440,7 +440,7 @@ nav{
 
 form {
   position: relative;
-  width: 300px;
+  width: 400px;
   margin: 0 auto;
   background: #8CD0E0;
  
@@ -471,7 +471,6 @@ input[type="text"]:focus {
 }
 
 input[type="submit"] {
-  
   height: 42px;
   width: 42px;
   position: absolute;
