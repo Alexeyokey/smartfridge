@@ -79,6 +79,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Type</th>
+                <th>allergic</th>
                 <th>Price</th>
                 <th>Actions</th>
             </tr>
@@ -89,6 +90,7 @@
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.type }}</td>
+                    <td>{{ product.allergic }}</td>
                     <td>{{ product.price }}</td>
                     <td>
                         <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>

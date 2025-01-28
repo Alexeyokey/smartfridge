@@ -50,6 +50,9 @@
         <label for="count">{{ form.count.label }}</label>
         {{ form.count(id="count") }}
 
+        <label for="calories">{{ form.calories.label }}</label>
+        {{ form.calories(id="calories") }}
+
         <label for="price">{{ form.price.label }}</label>
         {{ form.price(id="price") }}
 
@@ -57,13 +60,12 @@
         {{ form.discount_percent(id="discount_percent") }}
 
         <label for="produced_date(format: year-month-day hour:minute:second)">{{ form.produced_date.label }}</label>
-        {{ form.produced_date(id="produced_date") }}
+        {{ form.produced_date(id="produced_date", type="date") }}
 
         <label for="last_date(format: year-month-day hour:minute:second)">{{ form.last_date.label }}</label>
-        {{ form.last_date(id="last_date") }}
+        {{ form.last_date(id="last_date", type="date") }}
        <p>{{ form.submit(type="submit") }}</p> 
         <!-- <button type="submit"></button> -->
-        
     </form>
 </body>
 </html>

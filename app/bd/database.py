@@ -1,7 +1,8 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from peewee import *
-db = MySQLDatabase('fridge', host='127.0.0.1', port=3306, user='root', password='')
+from .db_config import TABLE, HOST, PORT, USER, PASSWORD
+db = MySQLDatabase(TABLE, host=HOST, port=PORT, user=USER, password=PASSWORD)
   
 # class Store(Model):
 #     id = PrimaryKeyField() 
@@ -40,6 +41,7 @@ class QR(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
     count = IntegerField()
+    calories = IntegerField()
     price = IntegerField()
     discount_percent = IntegerField()
     produced_date = DateTimeField()
@@ -49,10 +51,9 @@ class QR(Model):
     
 # Таблица единичного экземпляра продукта, содержащая всю информацию о его свойствах
 
-class Fridge(Model):
+class Storage(Model):
     id = PrimaryKeyField() 
     product = ForeignKeyField(QR, to_field='id')
-    # count = IntegerField()
     class Meta:
         database = db
     
@@ -69,15 +70,15 @@ class ShoppingListHistory(Model):
 # список всех покупок, совершенных через сканеры, каждая сущность прявязана к продукту и холодильнику
 
 
-db.create_tables([Product, QR, Fridge, ShoppingListHistory])
-sample_products = [
-    {"name": "Chocolate Bar", "type": "Snack",
-     "ingredients": "Cocoa, Sugar, Milk", "allergic": True},
-    {"name": "Apple Juice", "type": "Drink",
-     "ingredients": "Apple, Water, Sugar", "allergic": False},
-    {"name": "Peanut Butter", "type": "Spread",
-     "ingredients": "Peanuts, Salt, Oil", "allergic": True}
-]
+# db.create_tables([Product, QR, Storage, ShoppingListHistory])
+# sample_products = [
+#     {"name": "Chocolate Bar", "type": "Snack",
+#      "ingredients": "Cocoa, Sugar, Milk", "allergic": True},
+#     {"name": "Apple Juice", "type": "Drink",
+#      "ingredients": "Apple, Water, Sugar", "allergic": False},
+#     {"name": "Peanut Butter", "type": "Spread",
+#      "ingredients": "Peanuts, Salt, Oil", "allergic": True}
+# ]
 
 # Insert sample objects into the database
 # print(sample_products)
@@ -88,6 +89,7 @@ sample_products = [
 # for product in [1, 2, 3]:
 #     QR.create(
 #         product=product,
+#         calories=480,
 #         price=1000,  # Example price
 #         count=product * 10,
 #         discount_percent=10,  # Example discount percent

@@ -6,7 +6,15 @@
     {{ form.query(size=20, placeholder="Введите название...") }}
     {{ form.submit() }}
   </form>
+
+  <div class="pagination">
+    <button id="prevPage">Назад</button>
+    <span id="currentPage">{{ page }}</span>
+    <button id="nextPage">Вперёд</button>
+</div>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
     <div class = "table2" style="overflow: hidden;"> 
+       
     <table class="table22" style="border-collapse: separate; border-spacing: 0;"> 
        
         <thead> 
@@ -50,5 +58,6 @@
             {% endfor %} 
         </tbody> 
         </table> 
+       
     </div> 
 {% endblock %}
