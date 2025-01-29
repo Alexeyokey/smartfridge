@@ -70,7 +70,7 @@ class ShoppingListHistory(Model):
 # список всех покупок, совершенных через сканеры, каждая сущность прявязана к продукту и холодильнику
 
 
-# db.create_tables([Product, QR, Storage, ShoppingListHistory])
+db.create_tables([Product, QR, Storage, ShoppingListHistory])
 # sample_products = [
 #     {"name": "Chocolate Bar", "type": "Snack",
 #      "ingredients": "Cocoa, Sugar, Milk", "allergic": True},

@@ -1,8 +1,7 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField, DateTimeField
-from wtforms.validators import Optional, DataRequired, NumberRange
-
+from wtforms import StringField, SubmitField
+from wtforms.validators import Optional
 
 
 """форма поисковой строки

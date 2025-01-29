@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, url_for
 import requests
 from app import PORT
-from app.bd.database import Product
+from app.bd.database import Product, ShoppingListHistory
 from app.bd.database import QR
 from .forms import addqrform
-from .forms import searchform, addform
+from .forms import searchform, addform, productquantityform
 from .generate_qr import get_qrcode 
 
 # Создание объекта Blueprint для маршрутов главной части приложения
@@ -45,7 +45,8 @@ def index():
 def product(product_id):
     product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
     if product_json.status_code == 200:
-        return render_template('product.html', products=product_json.json()['products'])
+        form = productquantityform.Quantity()   
+        return render_template('product.html', form=form, products=product_json.json()['products'])
     else:
         return "Ошибка: Продукт не найден", 404
     

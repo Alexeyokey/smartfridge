@@ -36,6 +36,7 @@
             justify-content: center;
             align-items: center;
             border-radius: 5px;
+            overflow: hidden;
         }
 
         .scanner .scan-area::before {
@@ -45,6 +46,7 @@
             height: 80%;
             border: 2px solid #b2d4e8;
             border-radius: 5px;
+            z-index: 1;
         }
 
         .scanner .scan-area span {
@@ -95,6 +97,12 @@
 
         .back-button:hover, .menu-button:hover {
             background-color: #c3e2ef;
+        }
+
+        #preview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/schmich/instascan-builds@master/instascan.min.js"></script>

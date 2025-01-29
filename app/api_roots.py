@@ -49,16 +49,38 @@ def delete(id):
 
 
 # код для работы с таблицей QR
+@api.route('/expired_count', methods=['GET'])
+def expired_count():
+    count = QR.select().where(QR.last_date < datetime.now()).count()
+    return jsonify({'count': count})
+
+##### Работа с БД ShoppingListHistory #####
+# код для работы с таблицей ShoppingListHistory
 @api.route('/history/<int:page>', methods=['GET'])
 def get_shopping_history(page):
     products = ShoppingListHistory.select().where(QR.id > (page - 1) * COUNT_PAGE).limit(COUNT_PAGE)
     return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'quantity': obj.quantity}  for obj in products]})
 
-# код для работы с таблицей QR
-@api.route('/expired_count', methods=['GET'])
-def expired_count():
-    count = QR.select().where(QR.last_date < datetime.now()).count()
-    return jsonify({'count': count})
+# код для работы с таблицей ShoppingListHistory
+@api.route('/history', methods=['POST'])
+def add_shopping_history():
+    qr_id = request.json.get('qr_id')
+    quantity = request.json.get('quantity')
+    data = {
+            'product': qr_id,
+            'quantity': quantity
+        }
+    
+    history = ShoppingListHistory.create(**data)
+    return jsonify({'msg': 'added'})
+
+
+# код для работы с таблицей ShoppingListHistory
+@api.route('/history', methods=['DELETE'])
+def delete_shopping_history(id):
+    history = ShoppingListHistory.get(ShoppingListHistory.id == str(id))
+    history.delete_instance()
+    return jsonify({'msg': 'deleted'})
 
 
 ##### Работа с БД Storage #####
