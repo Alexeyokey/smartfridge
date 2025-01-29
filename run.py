@@ -1,10 +1,11 @@
+import eventlet
+eventlet.monkey_patch()
 from app import create_app
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
-import eventlet
 from app import PORT
 
-eventlet.monkey_patch()
+
 app = create_app()
 
 

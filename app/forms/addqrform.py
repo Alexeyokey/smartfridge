@@ -11,7 +11,6 @@ class AddQRForm(FlaskForm):
     """
     product = SelectField('Product', choices=[], coerce=int, validators=[DataRequired()])
     count = IntegerField('Count', validators=[DataRequired(), NumberRange(min=1)], render_kw={"placeholder": "Штук"})
-    calories = IntegerField('Calories', validators=[DataRequired()], render_kw={"placeholder": "Ккал"})
     price = IntegerField('Price', validators=[DataRequired(), NumberRange(min=0)], render_kw={"placeholder": "Рублей"})
     discount_percent = IntegerField('Discount Percent', validators=[NumberRange(min=0, max=100)], render_kw={"placeholder": "Процентов"})
     produced_date = DateTimeField('Produced Date', format='%Y-%m-%d', validators=[DataRequired()])

@@ -34,6 +34,7 @@ class Product(Model):
     id = PrimaryKeyField()
     name = CharField()
     type = CharField()
+    calories = IntegerField()
     ingredients = CharField()
     allergic = BooleanField()
     class Meta:
@@ -43,7 +44,6 @@ class QR(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
     count = IntegerField()
-    calories = IntegerField()
     price = IntegerField()
     discount_percent = IntegerField()
     produced_date = DateTimeField()
@@ -55,7 +55,7 @@ class QR(Model):
 
 class Storage(Model):
     id = PrimaryKeyField() 
-    product = ForeignKeyField(QR, to_field='id')
+    qr_product = ForeignKeyField(QR, to_field='id')
     class Meta:
         database = db
     

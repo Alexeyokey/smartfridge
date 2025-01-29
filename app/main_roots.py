@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for
+from flask import Blueprint, render_template, request, url_for, redirect
 import requests
 from app import PORT
 from app.bd.database import Product, ShoppingListHistory
@@ -16,7 +16,7 @@ main = Blueprint('main', __name__, template_folder="templates")
 def index():
     form = searchform.SearchForm()  
     page = request.args.get('page', 1) 
-    url = f'http://127.0.0.1:{PORT}/api/qr_products/{page}'
+    url = f'http://127.0.0.1:{PORT}/api/storage/{page}'
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -44,12 +44,29 @@ def index():
 @main.route('/product/<int:product_id>', methods=['GET'])
 def product(product_id):
     product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
+    print(product_json)
     if product_json.status_code == 200:
         form = productquantityform.Quantity()   
-        return render_template('product.html', form=form, products=product_json.json()['products'])
+        return render_template('product.html', product=product_json.json()['product'], form=form)
     else:
         return "Ошибка: Продукт не найден", 404
+
+
+@main.route('/product/<int:id>', methods=['POST'])
+def add_shopping_history(id):
+    form = productquantityform.Quantity()
+    if form.validate_on_submit(): 
+        data = {
+                'product': id,
+                'quantity': form.quantity.data
+            }
+
+        ShoppingListHistory.create(**data)
+        return redirect('/shopping_list')  
+    else:
+        return "Неверные данные", 403
     
+
 # Базовая страница шаблона
 @main.route('/base', methods=['GET'])
 def base():
@@ -67,11 +84,14 @@ def add_product():
         data = {
             'name': form.name.data,
             'type': form.type.data,
+            'calories': form.calories.data,
             'ingredients': form.ingredients.data,
             'allergic': form.allergic.data,
         }
         Product.create(**data) 
-        return "Product added successfully!" 
+        return redirect('/add_qr_product')  
+
+        
 
     return render_template('add_product.html', form=form)  
 
@@ -90,7 +110,6 @@ def add_qr_product():
         data = {
             'product': form.product.data,
             'count': form.count.data,
-            'calories': form.calories.data,
             'price': form.price.data,
             'discount_percent': form.discount_percent.data,
             'produced_date': form.produced_date.data,
@@ -98,7 +117,7 @@ def add_qr_product():
         }
         # print(form.produced_date.data)
         qr_code = QR.create(**data)  # Создание нового QR-кода для продукта)
-        get_qrcode(qr_code.id)  # Генерация QR-кода
+        # get_qrcode(qr_code.id)  # Генерация QR-кода
         product = requests.get(f'http://127.0.0.1:{PORT}/api/product/{qr_code.id}').json()  # Получение данных о продукте
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
 
@@ -106,10 +125,10 @@ def add_qr_product():
 
 ##### Списки #####
 # Страница списка покупок с пагинацией
-@main.route('/shopping_list/<int:page>', methods=['GET'])
-def shopping_list(page):
-    products = requests.get(f'http://127.0.0.1:{PORT}/api/shopping_list/{page}')  # Получение списка покупок с API
-    return render_template('shopping_list.html', product=products)  # Отображение списка покупок
+@main.route('/shopping_list', methods=['GET'])
+def shopping_list():
+    products = requests.get(f'http://127.0.0.1:{PORT}/api/shopping_list').json()  # Получение списка покупок с API
+    return render_template('shopping_list.html', products=products['products'])  # Отображение списка покупок
 
 ##### QR #####
 # Страница для сканирования QR-кодов
