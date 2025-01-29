@@ -2,7 +2,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from peewee import *
 from .db_config import TABLE, HOST, PORT, USER, PASSWORD
-db = MySQLDatabase(TABLE, host=HOST, port=PORT, user=USER, password=PASSWORD)
+
+db = SqliteDatabase('fridge.sqlite')
+# db = MySQLDatabase(TABLE, host=HOST, port=PORT, user=USER, password=PASSWORD)
   
 # class Store(Model):
 #     id = PrimaryKeyField() 
