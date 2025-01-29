@@ -88,7 +88,11 @@ def add_product():
             'ingredients': form.ingredients.data,
             'allergic': form.allergic.data,
         }
-        Product.create(**data) 
+        check = Product.get_or_none(Product.name == form.name.data)
+        if not check:
+            Product.create(**data) 
+        else:
+            return "Такой продукт уже есть в базе данных", 400
         return redirect('/add_qr_product')  
 
         
