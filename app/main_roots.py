@@ -121,7 +121,7 @@ def add_qr_product():
         }
         # print(form.produced_date.data)
         qr_code = QR.create(**data)  # Создание нового QR-кода для продукта)
-        # get_qrcode(qr_code.id)  # Генерация QR-кода
+        get_qrcode(qr_code.id)  # Генерация QR-кода
         product = requests.get(f'http://127.0.0.1:{PORT}/api/product/{qr_code.id}').json()  # Получение данных о продукте
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
 

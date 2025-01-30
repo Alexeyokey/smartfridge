@@ -9,3 +9,5 @@ def get_qrcode(id):
     path = os.path.join('app/static/qr_codes', f'qr_{id}.png') # создание пути и названия для qr code файла
     qr.save(path, 'PNG') # сохранение qr code в заданной директории
  
+
+# def remove_qrcode(id):
