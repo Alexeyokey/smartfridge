@@ -20,8 +20,9 @@ def get_products():
 def get_product(id):
     obj = QR.get(QR.id == str(id))
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
-    return jsonify({'product': {'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 
+    return jsonify({'product': {'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'product_id': obj.product.id,
                                   'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'allergic': obj.product.allergic}})
+
 
 # код для работы с таблицей QR
 @api.route('/qr_products/<int:page>', methods=['GET'])
@@ -38,14 +39,18 @@ def get_qr_products_limit(page):
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     expired_products = {}
     for obj in products:
-          expired_products[obj.id] = datetime.now() > obj.last_date
+          if not obj.deleted:
+            expired_products[obj.id] = datetime.now() > obj.last_date
     return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
 
 # код для работы с таблицей QR
 @api.route('/product/<int:id>', methods=['DELETE'])
-def delete(id):
+def product_delete(id):
     product = QR.get(QR.id == str(id))
-    product.delete_instance()
+    # product.delete_instance()
+    product.deleted = True
+    product.deleted_date = datetime.now()
+    product.save()
     return jsonify({'msg': 'deleted'})
 
 
@@ -53,22 +58,27 @@ def delete(id):
 # код для работы с таблицей QR
 @api.route('/expired_count', methods=['GET'])
 def expired_count():
-    count = QR.select().where(QR.last_date < datetime.now()).count()
+
+    count = QR.select().where(QR.last_date < datetime.now(), not QR.deleted).count()
     return jsonify({'count': count})
+
 
 ##### Работа с БД ShoppingListHistory #####
 # код для работы с таблицей ShoppingListHistory
 @api.route('/shopping_list', methods=['GET'])
 def get_shopping_history():
     products = ShoppingListHistory.select()
-    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'quantity': obj.quantity}  for obj in products]})
+
+    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'quantity': obj.quantity}  for obj in products if not obj.deleted]})
 
 
 # код для работы с таблицей ShoppingListHistory
 @api.route('/shopping_list/<int:id>', methods=['DELETE'])
 def delete_shopping_history(id):
     history = ShoppingListHistory.get(ShoppingListHistory.id == str(id))
-    history.delete_instance()
+    history.deleted = True
+    history.deleted_date = datetime.now()
+    history.save()
     return jsonify({'msg': 'deleted'})
 
 
@@ -100,10 +110,21 @@ def get_storage_products_limit(page):
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     expired_products = {}
     for obj in products:
-          expired_products[obj.id] = datetime.now() > obj.qr_product.last_date
+          if not obj.deleted:
+            expired_products[obj.id] = datetime.now() > obj.qr_product.last_date
     
     return jsonify({'products': [{'id': obj.id, 'name': obj.qr_product.product.name, 'calories': obj.qr_product.product.calories, 'type': obj.qr_product.product.type, 
                                   'price': obj.qr_product.price, 'count': obj.qr_product.count, 'produced_date': obj.qr_product.produced_date, 'last_date': obj.qr_product.last_date, 
-                                  'expired': expired_products[obj.id]} for obj in products]})
+                                  'expired': expired_products[obj.id]} for obj in products if not obj.deleted]})
 
+
+# код для работы с таблицей QR
+@api.route('/storage/<int:id>', methods=['DELETE'])
+def storage_delete(id):
+    product = Storage.get(Storage.id == str(id))
+    # product.delete_instance()
+    product.deleted = True
+    product.deleted_date = datetime.now()
+    product.save()
+    return jsonify({'msg': 'deleted'})
 

@@ -27,7 +27,6 @@ def send_notification():
     count = requests.get(f'http://127.0.0.1:{PORT}/api/expired_count').json()
     now = datetime.datetime.now().strftime('%H:%M:%S')
     message = f"ИСПОРЧЕНО ПРОДУКТОВ: {count['count']} ПРОВЕДИТЕ РЕВИЗИЮ"
-    # print(products)
     socketio.emit('notification', {'message': message})
 
 

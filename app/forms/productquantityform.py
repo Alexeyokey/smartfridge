@@ -1,12 +1,13 @@
 
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SubmitField
+from wtforms import IntegerField, SubmitField, HiddenField
 from wtforms.validators import DataRequired
 
 
 
 """форма для заказа на закупку (количество)
 """
-class Quantity(FlaskForm):
+class ProductOrder(FlaskForm):
     quantity = IntegerField('Количество', validators=[DataRequired()], render_kw={"placeholder": "Штук"})
+    product_id = HiddenField()
     submit = SubmitField(('Добавить в список покупок'))

@@ -10,7 +10,7 @@ class AddForm(FlaskForm):
         FlaskForm (_type_): _description_
     """
     name = StringField('Name', validators=[DataRequired()])
-    type = SelectField('Type',  choices=[],  validators=[DataRequired()])
+    type = StringField('Type', validators=[DataRequired()])
     calories = IntegerField('Calories', validators=[DataRequired()], render_kw={"placeholder": "Ккал"})
     ingredients = TextAreaField('Ingredients', validators=[DataRequired()])
     allergic = BooleanField('Allergic', validators=[Optional()])

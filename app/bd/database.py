@@ -37,6 +37,8 @@ class Product(Model):
     calories = IntegerField()
     ingredients = CharField()
     allergic = BooleanField()
+    deleted = BooleanField(default=False)
+    deleted_date = DateTimeField(null=True)
     class Meta:
         database = db
     
@@ -48,6 +50,8 @@ class QR(Model):
     discount_percent = IntegerField()
     produced_date = DateTimeField()
     last_date = DateTimeField()
+    deleted = BooleanField(default=False)
+    deleted_date = DateTimeField(null=True)
     class Meta:
         database = db
     
@@ -56,6 +60,8 @@ class QR(Model):
 class Storage(Model):
     id = PrimaryKeyField() 
     qr_product = ForeignKeyField(QR, to_field='id')
+    deleted = BooleanField(default=False)
+    deleted_date = DateTimeField(null=True)
     class Meta:
         database = db
     
@@ -65,8 +71,8 @@ class ShoppingListHistory(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
     quantity = IntegerField()
-    # scaner = ForeignKeyField(Scaner, to_field='id')
-    
+    deleted = BooleanField(default=False)
+    deleted_date = DateTimeField(null=True)
     class Meta:
         database = db
 # список всех покупок, совершенных через сканеры, каждая сущность прявязана к продукту и холодильнику

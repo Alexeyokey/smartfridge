@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, url_for, redirect
 import requests
+from datetime import datetime
 from app import PORT
 from app.bd.database import Product, ShoppingListHistory
-from app.bd.database import QR
+from app.bd.database import QR, Storage
 from .forms import addqrform
-from .forms import searchform, addform, productquantityform
+from .forms import searchform, addform, productquantityform, analytics
 from .generate_qr import get_qrcode 
 
 # Создание объекта Blueprint для маршрутов главной части приложения
@@ -39,14 +40,42 @@ def index():
 
     return render_template('main.html', table=table, form=form)  
 
+@main.route('/analytics', methods=['GET', 'POST'])
+def analytic():
+    form = analytics.AnalyticsDates()  
+    products = []
+    if form.validate_on_submit(): 
+        start_date = form.start_date.data 
+        end_date = form.end_date.data 
+        products_deleted = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.deleted_date > start_date) & ( QR.deleted_date < end_date)))
+        products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now()) &  (QR.last_date > start_date) & (QR.last_date < end_date)))
+        types_count = {}
+        for obj in products_deleted:
+            if obj.qr_product.product.type not in types_count:
+                types_count[obj.qr_product.product.type] = [0, 0]
+            types_count[obj.qr_product.product.type][0] += 1
+        for obj in products_spoiled:
+            if obj.qr_product.product.type not in types_count:
+                types_count[obj.qr_product.product.type] = [0, 0]
+            types_count[obj.qr_product.product.type][1] += 1
+        # print(types_count)
+        products = {
+            "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]}  for obj in types_count.items()]
+        }
+
+        print(products)
+        return render_template('analytics.html', form=form, products=products['products'])
+        # return redirect('/add_qr_product')  
+        
+        
+    return render_template('analytics.html', form=form, products=products)  
 
 # Страница для отображения информации о продукте
 @main.route('/product/<int:product_id>', methods=['GET'])
 def product(product_id):
     product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
-    print(product_json)
     if product_json.status_code == 200:
-        form = productquantityform.Quantity()   
+        form = productquantityform.ProductOrder(product_id=product_json.json()['product']['product_id'])   
         return render_template('product.html', product=product_json.json()['product'], form=form)
     else:
         return "Ошибка: Продукт не найден", 404
@@ -54,10 +83,10 @@ def product(product_id):
 
 @main.route('/product/<int:id>', methods=['POST'])
 def add_shopping_history(id):
-    form = productquantityform.Quantity()
+    form = productquantityform.ProductOrder()
     if form.validate_on_submit(): 
         data = {
-                'product': id,
+                'product': form.product_id.data,
                 'quantity': form.quantity.data
             }
 
@@ -77,15 +106,13 @@ def base():
 # Страница для добавления нового продукта
 @main.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    types = ['Snack', 'healthy'] # Список типов продуктов для выбора ЗАГЛУШКА!!!!!!!!!!!!!!
     form = addform.AddForm()  
-    form.type.choices = types  
     if form.validate_on_submit():  
         data = {
-            'name': form.name.data,
-            'type': form.type.data,
+            'name': form.name.data.lower(),
+            'type': form.type.data.lower(),
             'calories': form.calories.data,
-            'ingredients': form.ingredients.data,
+            'ingredients': form.ingredients.data.lower(),
             'allergic': form.allergic.data,
         }
         check = Product.get_or_none(Product.name == form.name.data)
@@ -96,7 +123,6 @@ def add_product():
         return redirect('/add_qr_product')  
 
         
-
     return render_template('add_product.html', form=form)  
 
 # Страница для добавления нового QR
@@ -126,6 +152,7 @@ def add_qr_product():
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
 
     return render_template('add_qr_product.html', form=form)  # Отображение формы добавления продукта с QR-кодом
+
 
 ##### Списки #####
 # Страница списка покупок с пагинацией

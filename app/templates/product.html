@@ -117,7 +117,7 @@
                         <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>
                         <script>
                             function deleteProduct(productId) {
-                                fetch(`/api/product/${productId}`, {
+                                fetch(`/api/storage/${productId}`, {
                                     method: 'DELETE'
                                 })
                                 .then(response => response.json())

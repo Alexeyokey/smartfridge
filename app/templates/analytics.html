@@ -18,7 +18,7 @@
 
         .container {
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
             background: white;
             border-radius: 10px;
             padding: 20px;
@@ -30,9 +30,21 @@
             margin-bottom: 20px;
         }
 
-        .stat {
-            font-size: 18px;
-            margin: 10px 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
         }
 
         .btn {
@@ -59,36 +71,38 @@
 <div class="container">
     <h2>Analytics</h2>
     <div class="date-picker">
-        <label for="start-date">С даты:</label>
-        <input type="date" id="start-date">
-        <label for="end-date">По дату:</label>
-        <input type="date" id="end-date">
-        <button onclick="updateAnalytics()" class="btn">Обновить</button>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <label for="start-date" id="start-date">{{ form.start_date.label }}</label>
+            {{ form.start_date(id="start_date", type="date") }}
+            <label for="end-date" id="end-date">{{ form.end_date.label }}</label>
+            {{ form.end_date(id="end_date", type="date") }}
+           <p> {{ form.submit(type="submit") }}</button> 
+        </form>
     </div>
-    <div class="stat">Количество удаленных продуктов: <span id="deleted-count">0</span></div>
-    <div class="stat">Количество испортившихся продуктов: <span id="spoiled-count">0</span></div>
-    <div class="stat">Потребление продуктов: <span id="consumed-count">0</span></div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Тип продукта</th>
+                <th>Удаленные</th>
+                <th>Испортившиеся</th>
+                <!-- <th>Потребленные</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.type }}</td>
+                <td>{{ product.count_deleted }}</td>
+                <td>{{ product.count_spoiled }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
     <a href="/" class="btn">Назад</a>
 </div>
-
-<script>
-    // Пример данных (можно заменить на динамическое обновление через API)
-    let deletedProducts = 12;
-    let spoiledProducts = 5;
-    let consumedProducts = 20;
-    
-    document.getElementById("deleted-count").textContent = deletedProducts;
-    document.getElementById("spoiled-count").textContent = spoiledProducts;
-    document.getElementById("consumed-count").textContent = consumedProducts;
-    
-    function updateAnalytics() {
-        let startDate = document.getElementById("start-date").value;
-        let endDate = document.getElementById("end-date").value;
-        
-        // Здесь можно добавить логику запроса к серверу с выбранными датами
-        alert(`Обновление данных с ${startDate} по ${endDate}`);
-    }
-</script>
 
 </body>
 </html>

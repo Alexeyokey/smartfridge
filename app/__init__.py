@@ -10,8 +10,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_pyfile('../config.py')
     socketio.init_app(app)
-    print('1')
-
 
     from .main_roots import main
     from .api_roots import api
