@@ -43,32 +43,29 @@ def index():
 @main.route('/analytics', methods=['GET', 'POST'])
 def analytic():
     form = analytics.AnalyticsDates()  
-    products = []
+    products = {}
+    products_deleted = Storage.select(Storage).where(((Storage.deleted == True)))
+    products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now())))
+    types_count = {}
     if form.validate_on_submit(): 
         start_date = form.start_date.data 
         end_date = form.end_date.data 
-        products_deleted = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.deleted_date > start_date) & ( QR.deleted_date < end_date)))
+        products_deleted = Storage.select(Storage).where(((Storage.deleted == 1) & (Storage.deleted_date > start_date) & ( Storage.deleted_date < end_date)))
         products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now()) &  (QR.last_date > start_date) & (QR.last_date < end_date)))
-        types_count = {}
-        for obj in products_deleted:
+
+
+    for obj in products_deleted:
             if obj.qr_product.product.type not in types_count:
                 types_count[obj.qr_product.product.type] = [0, 0]
             types_count[obj.qr_product.product.type][0] += 1
-        for obj in products_spoiled:
-            if obj.qr_product.product.type not in types_count:
-                types_count[obj.qr_product.product.type] = [0, 0]
-            types_count[obj.qr_product.product.type][1] += 1
-        # print(types_count)
-        products = {
+    for obj in products_spoiled:
+        if obj.qr_product.product.type not in types_count:
+            types_count[obj.qr_product.product.type] = [0, 0]
+        types_count[obj.qr_product.product.type][1] += 1
+    products = {
             "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]}  for obj in types_count.items()]
         }
-
-        print(products)
-        return render_template('analytics.html', form=form, products=products['products'])
-        # return redirect('/add_qr_product')  
-        
-        
-    return render_template('analytics.html', form=form, products=products)  
+    return render_template('analytics.html', form=form, products=products['products'])  
 
 # Страница для отображения информации о продукте
 @main.route('/product/<int:product_id>', methods=['GET'])
