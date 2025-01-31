@@ -84,12 +84,13 @@
 <body>
 
 <div class="container">
+    <a href="/">
     <div class="back-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
         </svg>
         <span>Back</span>
-    </div>
+    </div></a>
 
     <div class="container mt-5">
         <h1 class="mb-4">Product Management</h1>
@@ -113,6 +114,7 @@
                     <td>{{ product.type }}</td>
                     <td>{{ product.allergic }}</td>
                     <td>{{ product.price }}</td>
+                        
                     <td>
                         <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>
                         <script>
@@ -131,16 +133,40 @@
         </table>
         <div class="buttons">
             <!-- Кнопка "Добавить продукт" -->
+            {% if save %} 
+            <div class="buttons">
+                <!-- Кнопка "Добавить продукт" -->
+                <button onclick="saveproduct('{{ product.id }}')" class="btn" >Добавить продукт</button>
+                <script>
+                    function saveproduct(qr_id) {
+                        // console.log(product);
+                        fetch(`/api/add_qr_product_storage`, {
+                            headers: {
+                            'Content-Type': 'application/json'
+                        },
+    
+                        body: JSON.stringify({ qr_id: qr_id}),
+                            method: 'POST'
+                        })
+                        .then(response => response.json())
+                        .then(data => alert('Продукт добавлен'))
+                        .catch(error => console.error('Ошибка:', error));
+                    }
+                </script>
+                <!-- Кнопка "Скачать QR-код" -->
+                <button class="btn" id="download-qrcode-btn">Скачать QR-код</button>
+            </div>
+        
+            {% else %}
             <form method="POST">
                 {{ form.hidden_tag() }}
                 <label for="quantity">{{ form.quantity.label }}</label>
                 {{ form.quantity(id="quantity") }}
                <p> {{ form.submit(type="submit") }}</button> 
             </form>
+            {% endif %}
+            
             <!-- Кнопка "Скачать QR-код" -->
-            <div onclick="main_return()" class="btn">
-                <button class="btn btn-back" id="back-btn"> <a href="/">Назад</a></button>
-            </div>
             <!-- <button class="btn" id="download-qrcode-btn">Скачать QR-код</button> -->
         </div>
 

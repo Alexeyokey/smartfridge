@@ -37,21 +37,19 @@ class Product(Model):
     calories = IntegerField()
     ingredients = CharField()
     allergic = BooleanField()
-    deleted = BooleanField(default=False)
-    deleted_date = DateTimeField(null=True)
     class Meta:
         database = db
     
 class QR(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
-    count = IntegerField()
+    measurement = IntegerField()
+    type_measurement = CharField()
     price = IntegerField()
     discount_percent = IntegerField()
     produced_date = DateTimeField()
     last_date = DateTimeField()
-    deleted = BooleanField(default=False)
-    deleted_date = DateTimeField(null=True)
+    
     class Meta:
         database = db
     

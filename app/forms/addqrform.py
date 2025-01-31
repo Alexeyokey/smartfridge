@@ -9,9 +9,11 @@ class AddQRForm(FlaskForm):
     Args:
         FlaskForm (_type_): _description_
     """
-    product = SelectField('Product', choices=[], coerce=int, validators=[DataRequired()])
-    count = IntegerField('Count', validators=[DataRequired(), NumberRange(min=1)], render_kw={"placeholder": "Штук"})
-    price = IntegerField('Price', validators=[DataRequired(), NumberRange(min=0)], render_kw={"placeholder": "Рублей"})
+    choices = ['Миллилитры', "Литры", "Граммы", "Килограммы", "Количество"]
+    product = SelectField('Продукт', choices=[], coerce=int, validators=[DataRequired()])
+    measurement = IntegerField('Измерение', validators=[DataRequired(), NumberRange(min=1)])
+    type_measurement = SelectField('Тип измерения', choices=choices)
+    price = IntegerField('Цена', validators=[DataRequired(), NumberRange(min=0)], render_kw={"placeholder": "Рублей"})
     discount_percent = IntegerField('Discount Percent', validators=[NumberRange(min=0, max=100)], render_kw={"placeholder": "Процентов"})
     produced_date = DateTimeField('Produced Date', format='%Y-%m-%d', validators=[DataRequired()])
     last_date = DateTimeField('Last Date', format='%Y-%m-%d', validators=[DataRequired()])

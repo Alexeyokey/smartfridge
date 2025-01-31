@@ -21,7 +21,7 @@ def get_product(id):
     obj = QR.get(QR.id == str(id))
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
     return jsonify({'product': {'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'product_id': obj.product.id,
-                                  'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'allergic': obj.product.allergic}})
+                                  'measurement': obj.measurement, 'type_measurement': obj.type_measurement, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'allergic': obj.product.allergic}})
 
 
 # код для работы с таблицей QR
@@ -41,7 +41,7 @@ def get_qr_products_limit(page):
     for obj in products:
           if not obj.deleted:
             expired_products[obj.id] = datetime.now() > obj.last_date
-    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'count': obj.count, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
+    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'measurement': obj.measurement, 'type_measurement': obj.type_measurement, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
 
 # код для работы с таблицей QR
 @api.route('/product/<int:id>', methods=['DELETE'])
@@ -59,7 +59,7 @@ def product_delete(id):
 @api.route('/expired_count', methods=['GET'])
 def expired_count():
 
-    count = QR.select().where(QR.last_date < datetime.now(), not QR.deleted).count()
+    count = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (not Storage.deleted)).count()
     return jsonify({'count': count})
 
 
@@ -84,7 +84,7 @@ def delete_shopping_history(id):
 
 ##### Работа с БД Storage #####
 # код для работы с таблицей Storage
-@api.route('/add_qr_product', methods=['POST'])
+@api.route('/add_qr_product_storage', methods=['POST'])
 def add_storage_product():
     qr_id = request.json.get('qr_id')
     data = {
@@ -114,7 +114,7 @@ def get_storage_products_limit(page):
             expired_products[obj.id] = datetime.now() > obj.qr_product.last_date
     
     return jsonify({'products': [{'id': obj.id, 'name': obj.qr_product.product.name, 'calories': obj.qr_product.product.calories, 'type': obj.qr_product.product.type, 
-                                  'price': obj.qr_product.price, 'count': obj.qr_product.count, 'produced_date': obj.qr_product.produced_date, 'last_date': obj.qr_product.last_date, 
+                                  'price': obj.qr_product.price, 'measurement': obj.qr_product.type_measurement, 'type_measurement': obj.qr_product.type_measurement, 'produced_date': obj.qr_product.produced_date, 'last_date': obj.qr_product.last_date, 
                                   'expired': expired_products[obj.id]} for obj in products if not obj.deleted]})
 
 

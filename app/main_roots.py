@@ -46,8 +46,11 @@ def analytic():
     products = {}
     products_deleted = Storage.select(Storage).where(((Storage.deleted == True)))
     products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now())))
+    count_deleted = products_deleted.count()
+    count_spoiled = products_spoiled.count()
     types_count = {}
     if form.validate_on_submit(): 
+        print('!!!!!!')
         start_date = form.start_date.data 
         end_date = form.end_date.data 
         products_deleted = Storage.select(Storage).where(((Storage.deleted == 1) & (Storage.deleted_date > start_date) & ( Storage.deleted_date < end_date)))
@@ -63,16 +66,23 @@ def analytic():
             types_count[obj.qr_product.product.type] = [0, 0]
         types_count[obj.qr_product.product.type][1] += 1
     products = {
+
             "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]}  for obj in types_count.items()]
         }
-    return render_template('analytics.html', form=form, products=products['products'])  
+    counted = {
+        'counted': [{'deleted': count_deleted, 'spoiled': count_spoiled}]
+    }
+    return render_template('analytics.html', form=form, products=products['products'], counted=counted['counted'])  
 
 # Страница для отображения информации о продукте
 @main.route('/product/<int:product_id>', methods=['GET'])
 def product(product_id):
     product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
     if product_json.status_code == 200:
+        in_storage = Storage.get_or_none(Storage.id == product_json.json()['product']['id'])
         form = productquantityform.ProductOrder(product_id=product_json.json()['product']['product_id'])   
+        if not in_storage:
+            return render_template('product.html', product=product_json.json()['product'], form=form, save=True)
         return render_template('product.html', product=product_json.json()['product'], form=form)
     else:
         return "Ошибка: Продукт не найден", 404
@@ -136,7 +146,8 @@ def add_qr_product():
             return "Ошибка: Дата истечения срока годности не может быть раньше даты производства", 400
         data = {
             'product': form.product.data,
-            'count': form.count.data,
+            'measurement': form.measurement.data,
+            'type_measurement': form.type_measurement.data,
             'price': form.price.data,
             'discount_percent': form.discount_percent.data,
             'produced_date': form.produced_date.data,
@@ -144,7 +155,7 @@ def add_qr_product():
         }
         # print(form.produced_date.data)
         qr_code = QR.create(**data)  # Создание нового QR-кода для продукта)
-        get_qrcode(qr_code.id)  # Генерация QR-кода
+        get_qrcode(qr_code)  # Генерация QR-кода
         product = requests.get(f'http://127.0.0.1:{PORT}/api/product/{qr_code.id}').json()  # Получение данных о продукте
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
 

@@ -109,7 +109,9 @@
 </head>
 <body>
     <div class="scanner">
+        <a href="/"> 
         <div class="back-button">&larr;</div>
+    </a>
         <div class="menu-button">&#9776;</div>
         <div class="scan-area">
             <video id="preview">scan</video>
@@ -123,8 +125,9 @@
 
           scanner.addListener('scan', function (content) {
               document.getElementById('result').innerText = "Сканировано: " + content;
-              console.log('scan');
-              window.location.href = content; // Автопереход на страницу
+              console.log(content);
+              console.log(typeof(content));
+              window.location.href = 'http://127.0.0.1:5001/product/' + JSON.parse(content)['id']; // Автопереход на страницу
           });
 
           Instascan.Camera.getCameras().then(function (cameras) {
