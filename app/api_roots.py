@@ -59,7 +59,7 @@ def product_delete(id):
 @api.route('/expired_count', methods=['GET'])
 def expired_count():
 
-    count = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (not Storage.deleted)).count()
+    count = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (Storage.deleted == 0)).count()
     return jsonify({'count': count})
 
 

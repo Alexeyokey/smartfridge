@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect, flash
 import requests
 from datetime import datetime
 from app import PORT
@@ -126,7 +126,8 @@ def add_product():
         if not check:
             Product.create(**data) 
         else:
-            return "Такой продукт уже есть в базе данных", 400
+            flash('Такой продукт уже есть в базе данных')
+            return render_template('add_product.html', form=form) 
         return redirect('/add_qr_product')  
 
         
@@ -143,7 +144,8 @@ def add_qr_product():
     form.product.choices = products 
     if form.validate_on_submit(): 
         if form.last_date.data <= form.produced_date.data:
-            return "Ошибка: Дата истечения срока годности не может быть раньше даты производства", 400
+            flash('Такой продукт уже есть в базе данных')
+            return render_template('add_qr_product.html', form=form)
         data = {
             'product': form.product.data,
             'measurement': form.measurement.data,
