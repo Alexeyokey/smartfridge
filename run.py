@@ -2,7 +2,7 @@ import eventlet
 eventlet.monkey_patch()
 from app import create_app
 from apscheduler.schedulers.background import BackgroundScheduler
-import requests
+from app.bd_functions import bd_expired_count
 from app import PORT
 
 
@@ -24,14 +24,14 @@ def handle_disconnect():
 def send_notification():
     # products
     """Функция для отправки уведомления"""
-    count = requests.get(f'http://127.0.0.1:{PORT}/api/expired_count').json()
+    count = bd_expired_count()
     now = datetime.datetime.now().strftime('%H:%M:%S')
     message = f"ИСПОРЧЕНО ПРОДУКТОВ: {count['count']} ПРОВЕДИТЕ РЕВИЗИЮ"
     socketio.emit('notification', {'message': message})
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_notification, 'interval', minutes=0.05)
+scheduler.add_job(send_notification, 'interval', minutes=5)
 scheduler.start()
 
 if __name__ == '__main__':

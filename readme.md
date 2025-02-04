@@ -1,13 +1,18 @@
-установка venv:
-MAC
-python3 -m venv myenv
-source myenv/bin/activate 
+1. Создайте виртуальное окружение:
+ python -m venv venv
 
-WIN
-python -m venv venv
-venv\Scripts\activate
+2. Активируйте виртуальное окружение:
+ • Linux/macOS:
+ source venv/bin/activate
+ • Windows:
+ venv\Scripts\activate
 
-Скачивание библиотек
-pip install -r requirements.txt
+3. Обновите менеджер пакетов pip:
+ pip install --upgrade pip
 
+4. Скачивание библиотек
+ pip install -r requirements.txt
 
+5. Запуск веб аппа:
+ 
+ 

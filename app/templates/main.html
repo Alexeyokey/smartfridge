@@ -28,27 +28,34 @@
             </tr> 
         </thead> 
         <tbody>  
-            {% for row in table %}
-            {% if row.expired  %} 
+            {% for product in table %}
+            {% if product.expired  %} 
            
             <tr> 
                 
-                <td style='background-color: rgb(180, 98, 114);'> <a href="/product/{{ row.id }}">{{ row.id }}</a></td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ row.name }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ row.type }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ row.count }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ row.produced_date }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ row.last_date }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'><a href="/product/{{ product.id }}">{{ product.name }}</a></td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ product.type }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ product.count }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ product.produced_date }}</td> 
+                <td style='background-color: rgb(180, 98, 114);'>{{ product.last_date }}</td> 
             
             </tr> 
-        
+            {% elif product.soon  %} 
+            <tr> 
+                <td style='background-color: rgb(250, 200, 153);'><a href="/product/{{ product.id }}">{{ product.name }}></a></td> 
+                <td style='background-color: rgb(250, 200, 153);'>{{ product.type }}</td> 
+                <td style='background-color: rgb(250, 200, 153);'>{{ product.count }}</td> 
+                <td style='background-color: rgb(250, 200, 153);'>{{ product.produced_date }}</td> 
+                <td style='background-color: rgb(250, 200, 153);'>{{ product.last_date }}</td> 
+            
+            </tr> 
             {% else %}
             <tr> 
-                <td><a href="/product/{{ row.id }}">{{ row.name }}</a></td> 
-                <td>{{ row.type }}</td> 
-                <td>{{ row.count }}</td> 
-                <td>{{ row.produced_date }}</td> 
-                <td>{{ row.last_date }}</td>        
+                <td><a href="/product/{{ product.id }}">{{ product.name }}</a></td> 
+                <td>{{ product.type }}</td> 
+                <td>{{ product.count }}</td> 
+                <td>{{ product.produced_date }}</td> 
+                <td>{{ product.last_date }}</td>        
             </tr> 
             {% endif %}
 

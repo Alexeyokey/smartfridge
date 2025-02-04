@@ -100,6 +100,17 @@
             {% endfor %}
         </tbody>
     </table>
+    <tbody>
+        <tr>
+            <td>Всего удаленных продуктов:</td>
+            <td>{{ counted.deleted }} |</td>
+        </tr>
+        <tr>
+            <td>Всего испроченных продуктов:</td>
+            <td>{{ counted.spoiled }}</td>
+        </tr>
+    </tbody>
+</table>
     
     <a href="/" class="btn">Назад</a>
 </div>

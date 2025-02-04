@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
-from datetime import datetime
+from datetime import datetime, timedelta
 from app import COUNT_PAGE
 from app.bd.database import Storage, ShoppingListHistory, QR, Product
+from .bd_functions import *
 
 
 api = Blueprint('api', __name__, template_folder="templates")
@@ -27,21 +28,7 @@ def get_product(id):
 # код для работы с таблицей QR
 @api.route('/qr_products/<int:page>', methods=['GET'])
 def get_qr_products_limit(page):
-    """Извлекает разбитый на страницы список QR-продуктов.
-    
-        Аргументы:
-        page (int): номер страницы, для которой нужно выбрать товары.
-        
-        Возвращает:ответ в формате JSON,
-        содержащий список продуктов с их подробной информацией, включая статус истечения срока годности.
-    """
-    products = QR.select().where(QR.id > (page - 1) * COUNT_PAGE).order_by(QR.last_date).limit(COUNT_PAGE)
-    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
-    expired_products = {}
-    for obj in products:
-          if not obj.deleted:
-            expired_products[obj.id] = datetime.now() > obj.last_date
-    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'measurement': obj.measurement, 'type_measurement': obj.type_measurement, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'expired': expired_products[obj.id]} for obj in products]})
+    return jsonify(bd_get_qr_products(page))
 
 # код для работы с таблицей QR
 @api.route('/product/<int:id>', methods=['DELETE'])
@@ -54,22 +41,12 @@ def product_delete(id):
     return jsonify({'msg': 'deleted'})
 
 
-
-# код для работы с таблицей QR
-@api.route('/expired_count', methods=['GET'])
-def expired_count():
-
-    count = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (Storage.deleted == 0)).count()
-    return jsonify({'count': count})
-
-
 ##### Работа с БД ShoppingListHistory #####
 # код для работы с таблицей ShoppingListHistory
 @api.route('/shopping_list', methods=['GET'])
 def get_shopping_history():
-    products = ShoppingListHistory.select()
-
-    return jsonify({'products': [{'id': obj.id, 'name': obj.product.name, 'quantity': obj.quantity}  for obj in products if not obj.deleted]})
+    products = bd_get_shopping_history
+    return jsonify(products)
 
 
 # код для работы с таблицей ShoppingListHistory
@@ -94,31 +71,25 @@ def add_storage_product():
     return jsonify({'msg': 'added'})
 
 # код для работы с таблицей Storage
+@api.route('/expired_count', methods=['GET'])
+def expired_count():
+    count = bd_expired_count()
+    return jsonify({'count': count})
+
+# код для работы с таблицей Storage
+@api.route('/soon_expire', methods=['GET'])
+def soon_expire():
+    print(datetime.now() - timedelta(days=7))
+    return '1'
+    # count = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (Storage.deleted == 0)).count()
+    # return jsonify({'count': count})
+
+# код для работы с таблицей Storage
 @api.route('/storage/<int:page>', methods=['GET'])
 def get_storage_products_limit(page):
-    """Извлекает разбитый на страницы список продуктов в холодильнике.
-    
-        Аргументы:
-        page (int): номер страницы, для которой нужно выбрать товары.
-        
-        Возвращает:ответ в формате JSON,
-        содержащий список продуктов с их подробной информацией, включая статус истечения срока годности.
-    """
-    # print(Storage.qr_product.last_date)
-    products = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(Storage.id > (page - 1) * COUNT_PAGE).order_by(QR.last_date).limit(COUNT_PAGE)
-    
-    # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
-    expired_products = {}
-    for obj in products:
-          if not obj.deleted:
-            expired_products[obj.id] = datetime.now() > obj.qr_product.last_date
-    
-    return jsonify({'products': [{'id': obj.id, 'name': obj.qr_product.product.name, 'calories': obj.qr_product.product.calories, 'type': obj.qr_product.product.type, 
-                                  'price': obj.qr_product.price, 'measurement': obj.qr_product.type_measurement, 'type_measurement': obj.qr_product.type_measurement, 'produced_date': obj.qr_product.produced_date, 'last_date': obj.qr_product.last_date, 
-                                  'expired': expired_products[obj.id]} for obj in products if not obj.deleted]})
+   return jsonify(bd_get_storage_product(id))
 
-
-# код для работы с таблицей QR
+# код для работы с таблицей Storage
 @api.route('/storage/<int:id>', methods=['DELETE'])
 def storage_delete(id):
     product = Storage.get(Storage.id == str(id))

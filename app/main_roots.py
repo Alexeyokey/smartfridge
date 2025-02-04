@@ -7,6 +7,7 @@ from app.bd.database import QR, Storage
 from .forms import addqrform
 from .forms import searchform, addform, productquantityform, analytics
 from .generate_qr import get_qrcode 
+from .bd_functions import *
 
 # Создание объекта Blueprint для маршрутов главной части приложения
 main = Blueprint('main', __name__, template_folder="templates")
@@ -17,24 +18,14 @@ main = Blueprint('main', __name__, template_folder="templates")
 def index():
     form = searchform.SearchForm()  
     page = request.args.get('page', 1) 
-    url = f'http://127.0.0.1:{PORT}/api/storage/{page}'
     try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            try:
-                table = response.json()['products'] 
-            except requests.exceptions.JSONDecodeError:
-                print("Ошибка: Получен не-JSON ответ")
-                table = []
-        else:
-            print(f"Ошибка: API вернул статус {response.status_code}")
-            table = []
+        table = bd_get_storage_product(page)['products']
     except requests.exceptions.RequestException as e:
         print(f"Ошибка запроса: {e}")
         table = []
   
     query = request.args.get('query', '').strip().lower()  
-
+    print(table)
     if query:
         table = [row for row in table if query in row['name'].lower() or query in row['type'].lower()]
 
@@ -44,13 +35,12 @@ def index():
 def analytic():
     form = analytics.AnalyticsDates()  
     products = {}
-    products_deleted = Storage.select(Storage).where(((Storage.deleted == True)))
+    products_deleted = Storage.select(Storage).where(((Storage.deleted == 1)))
     products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now())))
     count_deleted = products_deleted.count()
     count_spoiled = products_spoiled.count()
     types_count = {}
     if form.validate_on_submit(): 
-        print('!!!!!!')
         start_date = form.start_date.data 
         end_date = form.end_date.data 
         products_deleted = Storage.select(Storage).where(((Storage.deleted == 1) & (Storage.deleted_date > start_date) & ( Storage.deleted_date < end_date)))
@@ -66,11 +56,10 @@ def analytic():
             types_count[obj.qr_product.product.type] = [0, 0]
         types_count[obj.qr_product.product.type][1] += 1
     products = {
-
             "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]}  for obj in types_count.items()]
         }
     counted = {
-        'counted': [{'deleted': count_deleted, 'spoiled': count_spoiled}]
+        'counted': {'deleted': count_deleted, 'spoiled': count_spoiled}
     }
     return render_template('analytics.html', form=form, products=products['products'], counted=counted['counted'])  
 
@@ -158,7 +147,6 @@ def add_qr_product():
         # print(form.produced_date.data)
         qr_code = QR.create(**data)  # Создание нового QR-кода для продукта)
         get_qrcode(qr_code)  # Генерация QR-кода
-        product = requests.get(f'http://127.0.0.1:{PORT}/api/product/{qr_code.id}').json()  # Получение данных о продукте
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
 
     return render_template('add_qr_product.html', form=form)  # Отображение формы добавления продукта с QR-кодом
@@ -168,7 +156,7 @@ def add_qr_product():
 # Страница списка покупок с пагинацией
 @main.route('/shopping_list', methods=['GET'])
 def shopping_list():
-    products = requests.get(f'http://127.0.0.1:{PORT}/api/shopping_list').json()  # Получение списка покупок с API
+    products = bd_get_shopping_history()  # Получение списка покупок с API
     return render_template('shopping_list.html', products=products['products'])  # Отображение списка покупок
 
 ##### QR #####
