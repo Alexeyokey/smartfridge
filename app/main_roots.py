@@ -17,7 +17,10 @@ main = Blueprint('main', __name__, template_folder="templates")
 @main.route('/', methods=['GET', "POST"])
 def index():
     form = searchform.SearchForm()  
-    page = request.args.get('page', 1) 
+    try:
+        page = int(request.args.get('page', 1)) 
+    except ValueError:
+        page = 1
     try:
         table = bd_get_storage_product(page)['products']
     except requests.exceptions.RequestException as e:
@@ -29,7 +32,7 @@ def index():
     if query:
         table = [row for row in table if query in row['name'].lower() or query in row['type'].lower()]
 
-    return render_template('main.html', table=table, form=form)  
+    return render_template('main.html', table=table, form=form, page=page, query=query)  
 
 @main.route('/analytics', methods=['GET', 'POST'])
 def analytic():
@@ -171,3 +174,6 @@ def scan():
 #     get_qrcode(product_id)  # Генерация QR-кода для продукта
 #     product = requests.get(f'http://127.0.0.1:{PORT}/product/{product_id}').json()  # Получение данных о продукте по ID
 #     return render_template('qr_code.html', product=product, product_id=product_id, url_product=url_for('static', filename=f'qr_codes/qr_{product_id}.png'))  # Отображение страницы с QR-кодом
+@main.route('/hi')
+def hi():
+    return render_template('hi.html')

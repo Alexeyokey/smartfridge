@@ -1,67 +1,73 @@
-{% extends "base.html" %} 
- 
-{% block content %} 
-<form method="GET" class="searchform">
-    {{ form.hidden_tag() }}
-    {{ form.query(size=20, placeholder="Введите название...") }}
-    {{ form.submit() }}
-  </form>
+{% extends "base.html" %}
 
-  <div class="pagination">
-    <button id="prevPage">Назад</button>
-    <span id="currentPage">{{ page }}</span>
-    <button id="nextPage">Вперёд</button>
-</div>
-<script src="{{ url_for('static', filename='main.js') }}"></script>
-    <div class = "table2" style="overflow: hidden;"> 
-       
-    <table class="table22" style="border-collapse: separate; border-spacing: 0;"> 
-       
-        <thead> 
-            
-            <tr class="tr2"> 
-            <th class="th3">Название</th> 
-            <th class="th3">Тип</th> 
-            <th class="th3">Измерение</th> 
-            <th class="th3"> Дата</th> 
-            <th class="th4">Срок годности</th> 
-            </tr> 
-        </thead> 
-        <tbody>  
-            {% for product in table %}
-            {% if product.expired  %} 
-           
-            <tr> 
-                
-                <td style='background-color: rgb(180, 98, 114);'><a href="/product/{{ product.id }}">{{ product.name }}</a></td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ product.type }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ product.count }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ product.produced_date }}</td> 
-                <td style='background-color: rgb(180, 98, 114);'>{{ product.last_date }}</td> 
-            
-            </tr> 
-            {% elif product.soon  %} 
-            <tr> 
-                <td style='background-color: rgb(250, 200, 153);'><a href="/product/{{ product.id }}">{{ product.name }}></a></td> 
-                <td style='background-color: rgb(250, 200, 153);'>{{ product.type }}</td> 
-                <td style='background-color: rgb(250, 200, 153);'>{{ product.count }}</td> 
-                <td style='background-color: rgb(250, 200, 153);'>{{ product.produced_date }}</td> 
-                <td style='background-color: rgb(250, 200, 153);'>{{ product.last_date }}</td> 
-            
-            </tr> 
-            {% else %}
-            <tr> 
-                <td><a href="/product/{{ product.id }}">{{ product.name }}</a></td> 
-                <td>{{ product.type }}</td> 
-                <td>{{ product.count }}</td> 
-                <td>{{ product.produced_date }}</td> 
-                <td>{{ product.last_date }}</td>        
-            </tr> 
-            {% endif %}
-
-            {% endfor %} 
-        </tbody> 
-        </table> 
-       
-    </div> 
+{% block content %}
+    <main class="p-4 flex flex-col gap-4 h-screen w-full max-w-xl mx-auto">
+        <form method="GET" class="flex gap-2 w-full py-4">
+            {{ form.hidden_tag() }}
+            {{ form.query(placeholder="Найти продукт...", value=query, class="outline-none flex-1 text-2xl placeholder-neutral-400") }}
+            <button>
+                <i class="ri-search-line ri-xl text-neutral-400"></i>
+            </button>
+        </form>
+        <div class="flex flex-col gap-3 flex-1 overflow-auto">
+            {% for row in table %}
+                {% if row.expired %}
+                    <a href="/product/{{ row.id }}"
+                       class="bg-neutral-50 rounded-2xl p-4 flex justify-between items-center text-neutral-500">
+                        <div class="flex items-start text-start flex-col">
+                            <h3 class="font-medium capitalize text-lg line-through">{{ row.name }}</h3>
+                            <p class="capitalize">{{ row.type }}</p>
+                        </div>
+                        <div class="flex items-end text-end flex-col">
+                            <p class="text-lg font-medium">x1</p>
+                            <p class="capitalize">{{ row.last_date.strftime("%d.%m.%Y") }}</p>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="/product/{{ row.id }}"
+                       class="bg-neutral-50 rounded-2xl p-4 flex justify-between items-center">
+                        <div class="flex items-start text-start flex-col">
+                            <h3 class="font-medium capitalize text-lg">{{ row.name }}</h3>
+                            <p class="text-neutral-700 capitalize">{{ row.type }}</p>
+                        </div>
+                        <div class="flex items-end text-end flex-col">
+                            <p class="text-lg font-medium text-green-500">x1</p>
+                            <p class="text-neutral-700 capitalize">{{ row.last_date.strftime("%d.%m.%Y") }}</p>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+            <div class="flex justify-between items-center">
+                <button
+                        class="rounded-full bg-neutral-50 size-9 disabled:text-neutral-400"
+                        id="prevPage"
+                        {% if page == 1 %}
+                        disabled
+                        {% endif %}
+                >
+                    <i class="ri-arrow-left-s-fill ri-xl"></i>
+                </button>
+                <span id="currentPage" class="text-neutral-500 text-center font-medium">
+                    Страница {{ page }}
+                </span>
+                <button class="rounded-full bg-neutral-50 size-9" id="nextPage">
+                    <i class="ri-arrow-right-s-fill ri-xl"></i>
+                </button>
+            </div>
+            <script src="{{ url_for('static', filename='main.js') }}"></script>
+        </div>
+        <div class="flex gap-4 font-medium text-sm">
+            <a href="/add_product" class="flex-1 text-white bg-green-500 rounded-2xl px-6 py-3 flex items-center justify-center gap-1">
+                <i class="ri-add-circle-fill"></i>
+                Новый продукт
+            </a>
+            <a href="/add_qr_product" class="flex-1 bg-neutral-50 rounded-2xl px-6 py-3 flex items-center justify-center gap-1">
+                <i class="ri-qr-scan-2-line"></i>
+                Новый QR
+            </a>
+        </div>
+        <a href="/scan" class="bg-neutral-50 rounded-2xl p-2 flex items-center justify-center gap-1 h-32">
+            <span class="text-neutral-700 font-medium">Нажмите для сканирования</span>
+        </a>
+    </main>
 {% endblock %}

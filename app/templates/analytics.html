@@ -1,119 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <h2>Analytics</h2>
+        <div>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <label for="start-date" id="start-date">{{ form.start_date.label }}</label>
+                {{ form.start_date(id="start_date", type="date") }}
+                <label for="end-date" id="end-date">{{ form.end_date.label }}</label>
+                {{ form.end_date(id="end_date", type="date") }}
+                {{ form.submit(type="submit") }}
+            </form>
+        </div>
 
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-        }
-
-        .date-picker {
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Analytics</h2>
-    <div class="date-picker">
-        <form method="POST">
-            {{ form.hidden_tag() }}
-            <label for="start-date" id="start-date">{{ form.start_date.label }}</label>
-            {{ form.start_date(id="start_date", type="date") }}
-            <label for="end-date" id="end-date">{{ form.end_date.label }}</label>
-            {{ form.end_date(id="end_date", type="date") }}
-           <p> {{ form.submit(type="submit") }}</button> 
-        </form>
-    </div>
-    
-    <table>
-        <thead>
+        <table>
+            <thead>
             <tr>
                 <th>Тип продукта</th>
                 <th>Удаленные</th>
                 <th>Испортившиеся</th>
                 <!-- <th>Потребленные</th> -->
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for product in products %}
-            <tr>
-                <td>{{ product.type }}</td>
-                <td>{{ product.count_deleted }}</td>
-                <td>{{ product.count_spoiled }}</td>
-            </tr>
+                <tr>
+                    <td>{{ product.type }}</td>
+                    <td>{{ product.count_deleted }}</td>
+                    <td>{{ product.count_spoiled }}</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
-    <tbody>
-        <tr>
-            <td>Всего удаленных продуктов:</td>
-            <td>{{ counted.deleted }} |</td>
-        </tr>
-        <tr>
-            <td>Всего испроченных продуктов:</td>
-            <td>{{ counted.spoiled }}</td>
-        </tr>
-    </tbody>
-</table>
-    
-    <a href="/" class="btn">Назад</a>
-</div>
+            </tbody>
+        </table>
 
-</body>
-</html>
+        <a href="/">Назад</a>
+    </div>
+{% endblock %}

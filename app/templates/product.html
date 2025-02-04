@@ -1,120 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
+            </svg>
+            <span>Back</span>
+        </div>
 
-        .container {
-            width: 90%;
-            max-width: 400px;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+        <div>
+            <h1>Product Management</h1>
 
-        .back-button {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .back-button span {
-            margin-left: 10px;
-            color: #007bff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .form-container {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .form-container button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .btn:focus {
-            outline: none;
-        }
-
-        .form-container button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <a href="/">
-    <div class="back-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
-        </svg>
-        <span>Back</span>
-    </div></a>
-
-    <div class="container mt-5">
-        <h1 class="mb-4">Product Management</h1>
-    
-        <!-- Products Table -->
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>allergic</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
+            <!-- Products Table -->
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>allergic</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.type }}</td>
                     <td>{{ product.allergic }}</td>
                     <td>{{ product.price }}</td>
-                        
                     <td>
                         <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>
                         <script>
@@ -122,86 +38,30 @@
                                 fetch(`/api/storage/${productId}`, {
                                     method: 'DELETE'
                                 })
-                                .then(response => response.json())
-                                .then(data => alert(data.message))
-                                .catch(error => console.error('Ошибка:', error));
+                                    .then(response => response.json())
+                                    .then(data => alert(data.message))
+                                    .catch(error => console.error('Ошибка:', error));
                             }
                         </script>
                     </td>
                 </tr>
-            </tbody>
-        </table>
-        <div class="buttons">
-            <!-- Кнопка "Добавить продукт" -->
-            {% if save %} 
-            <div class="buttons">
+                </tbody>
+            </table>
+            <div>
                 <!-- Кнопка "Добавить продукт" -->
-                <button onclick="saveproduct('{{ product.id }}')" class="btn" >Добавить продукт</button>
-                <script>
-                    function saveproduct(qr_id) {
-                        // console.log(product);
-                        fetch(`/api/add_qr_product_storage`, {
-                            headers: {
-                            'Content-Type': 'application/json'
-                        },
-    
-                        body: JSON.stringify({ qr_id: qr_id}),
-                            method: 'POST'
-                        })
-                        .then(response => response.json())
-                        .then(data => alert('Продукт добавлен'))
-                        .catch(error => console.error('Ошибка:', error));
-                    }
-                </script>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <label for="quantity">{{ form.quantity.label }}</label>
+                    {{ form.quantity(id="quantity") }}
+                    {{ form.submit(type="submit") }}
+                </form>
                 <!-- Кнопка "Скачать QR-код" -->
-                <button class="btn" id="download-qrcode-btn">Скачать QR-код</button>
+                <div onclick="main_return()">
+                    <button id="back-btn"><a href="/">Назад</a></button>
+                </div>
+                <!-- <button id="download-qrcode-btn">Скачать QR-код</button> -->
             </div>
-        
-            {% else %}
-            <form method="POST">
-                {{ form.hidden_tag() }}
-                <label for="quantity">{{ form.quantity.label }}</label>
-                {{ form.quantity(id="quantity") }}
-               <p> {{ form.submit(type="submit") }}</button> 
-            </form>
-            {% endif %}
-            
-            <!-- Кнопка "Скачать QR-код" -->
-            <!-- <button class="btn" id="download-qrcode-btn">Скачать QR-код</button> -->
-        </div>
 
-    </div>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <h2 class="mt-5">Shopping list</h2>
-    <form method="POST" action="/add-product">
-        <table class="form-table">
-            <tr>
-                <td><label for="name">Product Name:</label></td>
-                <td><input type="text" id="name" name="name" required></td>
-            </tr>
-            <tr>
-                <td><label for="type">Product Quantity:</label></td>
-                <td><input type="text" id="type" name="type" required></td>
-            </tr>
-            <tr>
-                <td><label for="price">Product Price:</label></td>
-                <td><input type="number" id="price" name="price" step="0.01" required></td>
-            </tr>
-        </table>
-        <div class="form-container">
-            <button type="submit">Submit</button>
         </div>
-        <script>
-            function add_product(productId) {
-                fetch('/add_product', {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => console.error('Ошибка:', error));
-            }
-        </script>
-    </form> -->
-</div>
-</body>
-</html>
+    </div>
+{% endblock %}
