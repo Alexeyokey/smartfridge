@@ -75,7 +75,7 @@ def product(product_id):
     """
     Отображает страницу с подробной информацией о продукте по его ID.
     """
-    product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
+    product_json = bd_get_product(product_id)
     if product_json.status_code == 200:
         in_storage = Storage.get_or_none(Storage.id == product_json.json()['product']['id'])
         form = productquantityform.ProductOrder(product_id=product_json.json()['product']['product_id'])   
