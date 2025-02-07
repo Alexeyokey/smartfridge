@@ -43,7 +43,7 @@ class Product(Model):
 class QR(Model):
     id = PrimaryKeyField()
     product = ForeignKeyField(Product, to_field='id')
-    coiunt = IntegerField()
+    count = IntegerField(default=1)
     measurement = IntegerField()
     type_measurement = CharField()
     price = IntegerField()

@@ -11,6 +11,7 @@ class AddQRForm(FlaskForm):
     """
     choices = ['Миллилитры', "Литры", "Граммы", "Килограммы", "Количество"]
     product = SelectField('Продукт', choices=[], coerce=int, validators=[DataRequired()])
+    count = IntegerField('Количество', validators=[DataRequired(), NumberRange(min=1)])
     measurement = IntegerField('Измерение', validators=[DataRequired(), NumberRange(min=1)])
     type_measurement = SelectField('Тип измерения', choices=choices)
     price = IntegerField('Цена', validators=[DataRequired(), NumberRange(min=0)], render_kw={"placeholder": "Рублей"})

@@ -16,6 +16,10 @@ main = Blueprint('main', __name__, template_folder="templates")
 # Главная страница с таблицей продуктов и поисковой формой
 @main.route('/', methods=['GET', "POST"])
 def index():
+    """
+    Отображает главную страницу с таблицей продуктов и поисковой формой.
+    Поддерживает пагинацию и фильтрацию списка продуктов по запросу пользователя.
+    """
     form = searchform.SearchForm()  
     try:
         page = int(request.args.get('page', 1)) 
@@ -28,83 +32,90 @@ def index():
         table = []
   
     query = request.args.get('query', '').strip().lower()  
-    print(table)
     if query:
         table = [row for row in table if query in row['name'].lower() or query in row['type'].lower()]
 
     return render_template('main.html', table=table, form=form, page=page, query=query)  
 
+# Страница с аналитикой продуктов
 @main.route('/analytics', methods=['GET', 'POST'])
 def analytic():
+    """
+    Отображает страницу аналитики, включая статистику по удаленным и испорченным продуктам.
+    Фильтрует данные по заданным пользователем датам.
+    """
     form = analytics.AnalyticsDates()  
-    products = {}
-    products_deleted = Storage.select(Storage).where(((Storage.deleted == 1)))
-    products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now())))
+    products_deleted = Storage.select(Storage).where(Storage.deleted == 1)
+    products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(QR.last_date < datetime.now())
     count_deleted = products_deleted.count()
     count_spoiled = products_spoiled.count()
     types_count = {}
+    
     if form.validate_on_submit(): 
         start_date = form.start_date.data 
         end_date = form.end_date.data 
-        products_deleted = Storage.select(Storage).where(((Storage.deleted == 1) & (Storage.deleted_date > start_date) & ( Storage.deleted_date < end_date)))
-        products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where(((QR.last_date < datetime.now()) &  (QR.last_date > start_date) & (QR.last_date < end_date)))
-
+        products_deleted = Storage.select(Storage).where((Storage.deleted == 1) & (Storage.deleted_date > start_date) & (Storage.deleted_date < end_date))
+        products_spoiled = Storage.select(Storage).join(QR, on=(Storage.qr_product == QR.id)).where((QR.last_date < datetime.now()) & (QR.last_date > start_date) & (QR.last_date < end_date))
 
     for obj in products_deleted:
-            if obj.qr_product.product.type not in types_count:
-                types_count[obj.qr_product.product.type] = [0, 0]
-            types_count[obj.qr_product.product.type][0] += 1
+        types_count.setdefault(obj.qr_product.product.type, [0, 0])[0] += 1
     for obj in products_spoiled:
-        if obj.qr_product.product.type not in types_count:
-            types_count[obj.qr_product.product.type] = [0, 0]
-        types_count[obj.qr_product.product.type][1] += 1
+        types_count.setdefault(obj.qr_product.product.type, [0, 0])[1] += 1
+    
     products = {
-            "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]}  for obj in types_count.items()]
-        }
-    counted = {
-        'counted': {'deleted': count_deleted, 'spoiled': count_spoiled}
+        "products": [{'type': obj[0], 'count_deleted': obj[1][0], 'count_spoiled': obj[1][1]} for obj in types_count.items()]
     }
+    counted = {'counted': {'deleted': count_deleted, 'spoiled': count_spoiled}}
+    
     return render_template('analytics.html', form=form, products=products['products'], counted=counted['counted'])  
 
 # Страница для отображения информации о продукте
 @main.route('/product/<int:product_id>', methods=['GET'])
 def product(product_id):
+    """
+    Отображает страницу с подробной информацией о продукте по его ID.
+    """
     product_json = requests.get(f'http://127.0.0.1:{PORT}/api/product/{product_id}')
     if product_json.status_code == 200:
         in_storage = Storage.get_or_none(Storage.id == product_json.json()['product']['id'])
         form = productquantityform.ProductOrder(product_id=product_json.json()['product']['product_id'])   
-        if not in_storage:
-            return render_template('product.html', product=product_json.json()['product'], form=form, save=True)
-        return render_template('product.html', product=product_json.json()['product'], form=form)
+        return render_template('product.html', product=product_json.json()['product'], form=form, save=not in_storage)
     else:
         return "Ошибка: Продукт не найден", 404
 
-
+# Добавление записи в историю покупок
 @main.route('/product/<int:id>', methods=['POST'])
 def add_shopping_history(id):
+    """
+    Добавляет запись о покупке продукта в историю покупок.
+    """
     form = productquantityform.ProductOrder()
     if form.validate_on_submit(): 
         data = {
-                'product': form.product_id.data,
-                'quantity': form.quantity.data
-            }
-
+            'product': form.product_id.data,
+            'quantity': form.quantity.data
+        }
         ShoppingListHistory.create(**data)
         return redirect('/shopping_list')  
     else:
         return "Неверные данные", 403
-    
 
 # Базовая страница шаблона
 @main.route('/base', methods=['GET'])
 def base():
-    return render_template('base.html')  # Отображение базового шаблона
+    """
+    Отображает базовую страницу шаблона.
+    """
+    return render_template('base.html')
 
-  
 ##### Добавление продуктов и QR кодов #####
 # Страница для добавления нового продукта
 @main.route('/add_product', methods=['GET', 'POST'])
 def add_product():
+    """
+    Отображает форму добавления нового продукта в базу данных.
+    Проверяет существование продукта перед добавлением.
+    """
     form = addform.AddForm()  
     if form.validate_on_submit():  
         data = {
@@ -114,52 +125,41 @@ def add_product():
             'ingredients': form.ingredients.data.lower(),
             'allergic': form.allergic.data,
         }
-        check = Product.get_or_none(Product.name == form.name.data)
-        if not check:
+        if not Product.get_or_none(Product.name == form.name.data):
             Product.create(**data) 
-        else:
-            flash('Такой продукт уже есть в базе данных')
-            return render_template('add_product.html', form=form) 
-        return redirect('/add_qr_product')  
-
-        
+            return redirect('/add_qr_product')  
+        flash('Такой продукт уже есть в базе данных')
     return render_template('add_product.html', form=form)  
 
-# Страница для добавления нового QR
+# Страница для добавления нового QR-кода
 @main.route('/add_qr_product', methods=['GET', 'POST'])
 def add_qr_product():
+    """
+    Отображает форму для добавления QR-кода к продукту.
+    Генерирует QR-код при успешной валидации формы.
+    """
     form = addqrform.AddQRForm()
     json_products = requests.get(f'http://127.0.0.1:{PORT}/api/products').json()  
-    products = []
-    for i in json_products['products']:
-        products.append((i['id'], i['name']))
-    form.product.choices = products 
+    form.product.choices = [(i['id'], i['name']) for i in json_products['products']]
+    
     if form.validate_on_submit(): 
         if form.last_date.data <= form.produced_date.data:
-            flash('Такой продукт уже есть в базе данных')
+            flash('Неверные даты')
             return render_template('add_qr_product.html', form=form)
-        data = {
-            'product': form.product.data,
-            'measurement': form.measurement.data,
-            'type_measurement': form.type_measurement.data,
-            'price': form.price.data,
-            'discount_percent': form.discount_percent.data,
-            'produced_date': form.produced_date.data,
-            'last_date': form.last_date.data
-        }
-        # print(form.produced_date.data)
-        qr_code = QR.create(**data)  # Создание нового QR-кода для продукта)
-        get_qrcode(qr_code)  # Генерация QR-кода
-        return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))  # Отображение страницы с QR-кодом
-
-    return render_template('add_qr_product.html', form=form)  # Отображение формы добавления продукта с QR-кодом
+        if form.type_measurement.lower() == 'количество':
+            count = form.measurement
+        data = form.data
+        count = 1
+        data['count'] = count
+        qr_code = QR.create(**form.data)  
+        get_qrcode(qr_code)  
+        return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))
+    return render_template('add_qr_product.html', form=form)  
 
 
-##### Списки #####
-# Страница списка покупок с пагинацией
 @main.route('/shopping_list', methods=['GET'])
 def shopping_list():
-    products = bd_get_shopping_history()  # Получение списка покупок с API
+    products = requests.get(f'http://127.0.0.1:{PORT}/api/shopping_list').json()  # Получение списка покупок с API
     return render_template('shopping_list.html', products=products['products'])  # Отображение списка покупок
 
 ##### QR #####
@@ -167,13 +167,3 @@ def shopping_list():
 @main.route('/scan', methods=['GET'])
 def scan():
     return render_template('qrscan.html')  # Отображение страницы для сканирования QR-кода
-
-# Страница для генерации QR-кода для продукта
-# @main.route('/generate_qr', methods=['GET', 'POST'])
-# def generate_qr(product_id):
-#     get_qrcode(product_id)  # Генерация QR-кода для продукта
-#     product = requests.get(f'http://127.0.0.1:{PORT}/product/{product_id}').json()  # Получение данных о продукте по ID
-#     return render_template('qr_code.html', product=product, product_id=product_id, url_product=url_for('static', filename=f'qr_codes/qr_{product_id}.png'))  # Отображение страницы с QR-кодом
-@main.route('/hi')
-def hi():
-    return render_template('hi.html')

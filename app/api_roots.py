@@ -19,11 +19,9 @@ def get_products():
 # код для работы с таблицей QR
 @api.route('/product/<int:id>', methods=['GET'])
 def get_product(id):
-    obj = QR.get(QR.id == str(id))
+    product = bd_get_product(id)
     # select * from products WHERE id > (page - 1) * COUNT_PAGE LIMIT COUNT_PAGE
-    return jsonify({'product': {'id': obj.id, 'name': obj.product.name, 'type': obj.product.type, 'price': obj.price, 'product_id': obj.product.id,
-                                  'measurement': obj.measurement, 'type_measurement': obj.type_measurement, 'produced_date': obj.produced_date, 'last_date': obj.last_date, 'allergic': obj.product.allergic}})
-
+    return jsonify(product)
 
 # код для работы с таблицей QR
 @api.route('/qr_products/<int:page>', methods=['GET'])
@@ -44,8 +42,8 @@ def product_delete(id):
 ##### Работа с БД ShoppingListHistory #####
 # код для работы с таблицей ShoppingListHistory
 @api.route('/shopping_list', methods=['GET'])
-def get_shopping_history():
-    products = bd_get_shopping_history
+def gset_shopping_history():
+    products = bd_get_shopping_history()
     return jsonify(products)
 
 

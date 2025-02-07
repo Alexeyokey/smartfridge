@@ -1,5 +1,10 @@
 venv/
+.venv/
+node_modules/
 __pycache__/
 *.pyc
 # *.db
 instance/
+instance/
+.idea
+/app/static/css/app.css
