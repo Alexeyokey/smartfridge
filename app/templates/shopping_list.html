@@ -1,137 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchases</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+{% extends "base.html" %}
 
-        .container {
-            width: 90%;
-            max-width: 500px;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .back-button {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .back-button span {
-            margin-left: 10px;
-            color: #007bff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        .delete-button {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .delete-button:hover {
-            background-color: #cc0000;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-        }
-    </style>
-</head>
-<body>
-
-<div>
-    <div onclick="window.location.href='/'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
-        </svg>
-        <span>Back</span>
-    </div>
-
-    <h2>Purchase List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID продукта</th>
-                <th>Название</th>
-                <th>Количество</th>
-            </tr>
-        </thead>
-        <tbody id="purchase-table-body">
+{% block content %}
+    <main class="p-4 flex flex-col gap-4 h-screen w-full max-w-xl mx-auto">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+        <div class="bg-neutral-50 p-4 flex flex-col gap-4 rounded-2xl flex-1 overflow-auto">
             {% for product in products %}
-            <tr>
-                <td>{{ product.id }}</td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.quantity }}</td>
-                <td> <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>
-                    <script>
-                        function deleteProduct(productId) {
-                            fetch(`/api/shopping_list/${productId}`, {
-                                method: 'DELETE'
-                            })
-                            .then(response => response.json())
-                            .then(data => alert(data.message))
-                            .catch(error => console.error('Ошибка:', error));
-                        }
-                    </script></td>
-            </tr>
+                <div class="flex items-center gap-2">
+                    <div class="font-medium capitalize">{{ product.name }}</div>
+                    <div class="text-green-500">x{{ product.quantity }}</div>
+                    <div class="flex-1"></div>
+                    <button onclick="deleteProduct('{{ product.id }}')">
+                        <i class="ri-delete-bin-fill"></i>
+                    </button>
+                </div>
             {% endfor %}
-
-        </tbody>
-    </table>
-
-    <a href="/">Назад</a>
-</div>
-
-<script>
-    function deletePurchase(button) {
-        let row = button.parentElement.parentElement;
-        row.remove();
-    }
-</script>
-
-</body>
-</html>
+        </div>
+        <script>
+            function deleteProduct(productId) {
+                fetch(`/api/shopping_list/${productId}`, {
+                    method: 'DELETE'
+                }).catch(error => console.error('Ошибка:', error));
+            }
+        </script>
+    </main>
+{% endblock %}

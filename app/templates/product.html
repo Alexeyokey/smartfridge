@@ -1,67 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                      d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
-            </svg>
-            <span>Back</span>
-        </div>
-
-        <div>
-            <h1>Product Management</h1>
-
-            <!-- Products Table -->
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>allergic</th>
-                    <th>Price</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{{ product.id }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.type }}</td>
-                    <td>{{ product.allergic }}</td>
-                    <td>{{ product.price }}</td>
-                    <td>
-                        <button onclick="deleteProduct('{{ product.id }}')">Удалить продукт</button>
-                        <script>
-                            function deleteProduct(productId) {
-                                fetch(`/api/storage/${productId}`, {
-                                    method: 'DELETE'
-                                })
-                                    .then(response => response.json())
-                                    .then(data => alert(data.message))
-                                    .catch(error => console.error('Ошибка:', error));
-                            }
-                        </script>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div>
-                <!-- Кнопка "Добавить продукт" -->
-                <form method="POST">
-                    {{ form.hidden_tag() }}
-                    <label for="quantity">{{ form.quantity.label }}</label>
-                    {{ form.quantity(id="quantity") }}
-                    {{ form.submit(type="submit") }}
-                </form>
-                <!-- Кнопка "Скачать QR-код" -->
-                <div onclick="main_return()">
-                    <button id="back-btn"><a href="/">Назад</a></button>
-                </div>
-                <!-- <button id="download-qrcode-btn">Скачать QR-код</button> -->
+    <main class="w-full max-w-xl mx-auto p-4 relative h-screen flex flex-col gap-4">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+        <div class="bg-neutral-50 p-4 flex flex-col gap-4 rounded-2xl flex-1 overflow-auto">
+            <h1 class="text-2xl font-bold my-2 capitalize">{{ product.name }}</h1>
+            <div class="flex flex-col gap-1 items-start">
+                <span class="text-neutral-700">Тип</span>
+                <p class="font-medium text-lg capitalize">{{ product.type }}</p>
             </div>
-
+            <div class="flex flex-col gap-1 items-start">
+                <span class="text-neutral-700">Цена</span>
+                <p class="font-medium text-lg">{{ product.price }}</p>
+            </div>
+            <div class="flex flex-col gap-1 items-start">
+                <span class="text-neutral-700">{{ product.type_measurement }}</span>
+                <p class="font-medium text-lg">{{ product.measurement }}</p>
+            </div>
+            <div class="flex flex-col gap-1 items-start">
+                <span class="text-neutral-700">Произведён</span>
+                <p class="font-medium text-lg">{{ product.produced_date.strftime("%d.%m.%Y") }}</p>
+            </div>
+            <div class="flex flex-col gap-1 items-start">
+                <span class="text-neutral-700">Годен до</span>
+                <p class="font-medium text-lg">{{ product.last_date.strftime("%d.%m.%Y") }}</p>
+            </div>
+            {% if product.allergic %}
+                <p class="font-medium">Аллерген!</p>
+            {% endif %}
+            <div class="flex-1"></div>
         </div>
-    </div>
+        <form method="POST" class="flex gap-4 sm:items-center justify-center max-sm:flex-col">
+            {{ form.hidden_tag() }}
+            {{ form.quantity(id="quantity", placeholder="Количество", class="placeholder-neutral-500 outline-none py-2 sm:w-32") }}
+            <button class="flex-1 text-white bg-green-500 rounded-2xl px-6 py-3 flex items-center justify-center gap-1">
+                <i class="ri-shopping-basket-2-fill"></i>
+                Добавить в список покупок
+            </button>
+        </form>
+        <button class="bg-neutral-50 rounded-2xl px-6 py-3 flex items-center justify-center gap-1" onclick="deleteProduct()">
+            <i class="ri-delete-bin-fill"></i>
+            Удалить продукт
+        </button>
+        <script>
+            function deleteProduct() {
+                const id = {{ product.id|safe }}
+                fetch(`/api/storage/${id}`, {
+                    method: 'DELETE'
+                })
+                    .catch(error => console.error('Ошибка:', error));
+            }
+        </script>
+    </main>
 {% endblock %}

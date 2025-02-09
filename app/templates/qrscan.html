@@ -8,7 +8,6 @@
         <div class="w-full h-full rounded-2xl overflow-hidden bg-neutral-50">
             <video id="preview" class="w-full h-full object-cover">scan</video>
         </div>
-        <p id="result">.....</p>
         <button class="size-12 bg-green-500 rounded-full absolute left-1/2 bottom-12 -translate-x-1/2"></button>
     </main>
     <script>
@@ -16,9 +15,7 @@
             let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
 
             scanner.addListener('scan', function (content) {
-                document.getElementById('result').innerText = "Сканировано: " + content;
-                console.log('scan');
-                window.location.href = content; // Автопереход на страницу
+                window.location.href = 'product/' + JSON.parse(content)['id']; // Автопереход на страницу
             });
 
             Instascan.Camera.getCameras().then(function (cameras) {

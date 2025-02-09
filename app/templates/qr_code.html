@@ -1,53 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-
-        <h1>QR-код товара</h1>
+    <main class="p-4 flex flex-col gap-4 h-screen w-full max-w-xl mx-auto">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
 
         <!-- Рамка для QR-кода -->
-        <div id="qr-code-container">
+        <div class="bg-neutral-50 rounded-2xl p-4">
             <!-- Здесь будет отображаться QR-код -->
             <img src="{{ url_product }}" alt="QR Code" id="qr-code"/>
         </div>
 
         <!-- Кнопки -->
-        <div>
+        <div class="flex gap-4 font-medium text-sm max-sm:flex-col">
             <!-- Кнопка "Добавить продукт" -->
-            <button onclick="saveproduct('{{ qr_id }}')">Добавить продукт</button>
+            <button
+                    class="flex-1 text-white bg-green-500 rounded-2xl px-6 py-3 flex items-center justify-center gap-1"
+                    onclick="saveProduct()"
+            >
+                <i class="ri-save-fill"></i>
+                Сохранить продукт
+            </button>
             <script>
-                function saveproduct(qr_id) {
-                    // console.log(product);
-                    fetch(`/api/add_qr_product`, {
+                function saveProduct() {
+                    const qrId = "{{ qr_id|safe }}"
+                    fetch(`/api/add_qr_product_storage`, {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-
-                        body: JSON.stringify({qr_id: qr_id}),
-
+                        body: JSON.stringify({ qr_id: qrId }),
                         method: 'POST'
                     })
-                        .then(response => response.json())
-                        .then(data => alert(data.message))
+                        .then(() => location.href = '/')
                         .catch(error => console.error('Ошибка:', error));
                 }
             </script>
             <!-- Кнопка "Скачать QR-код" -->
-            <button id="download-qrcode-btn">Скачать QR-код</button>
+            <a href="{{ url_product }}" download="qr-code.png" class="flex-1 bg-neutral-50 rounded-2xl px-6 py-3 flex items-center justify-center gap-1">
+                <i class="ri-download-2-fill"></i>
+                Скачать QR-код
+            </a>
         </div>
-
-        <div>
-            <button id="back-btn"><a href='/'> Назад</a></button>
-        </div>
-    </div>
-
-    <script>
-        // Функция для скачивания QR-кода
-        document.getElementById('download-qrcode-btn').addEventListener('click', function () {
-            const qrCodeImg = document.getElementById('qr-code');
-            const link = document.createElement('a');
-            link.href = qrCodeImg.src;
-            link.download = 'qr-code.png';
-            link.click();
-        });
-    </script>
+    </main>
 {% endblock %}

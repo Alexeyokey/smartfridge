@@ -1,38 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <h2>Analytics</h2>
-        <div>
-            <form method="POST">
+    <main class="p-4 flex flex-col gap-4 h-screen w-full max-w-xl mx-auto">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+
+        <div class="flex flex-col gap-2 w-full">
+            <span class="text-sm">Диапазон дат</span>
+            <form method="POST" class="flex items-center gap-2 p-4 bg-neutral-50 rounded-2xl">
                 {{ form.hidden_tag() }}
-                <label for="start-date" id="start-date">{{ form.start_date.label }}</label>
-                {{ form.start_date(id="start_date", type="date") }}
-                <label for="end-date" id="end-date">{{ form.end_date.label }}</label>
-                {{ form.end_date(id="end_date", type="date") }}
-                {{ form.submit(type="submit") }}
+                {{ form.start_date(id="start_date", type="date", class="flex-1 outline-none") }}
+                {{ form.end_date(id="end_date", type="date", class="flex-1 outline-none") }}
+                <button>
+                    <i class="ri-search-line text-green-500"></i>
+                </button>
             </form>
         </div>
 
-        <table>
-            <thead>
-            <tr>
-                <th>Тип продукта</th>
-                <th>Удаленные</th>
-                <th>Испортившиеся</th>
-                <!-- <th>Потребленные</th> -->
-            </tr>
-            </thead>
-            <tbody>
+        <div class="flex flex-col gap-2 w-full divide-neutral-50 divide-y">
+            <div class="flex items-center gap-2 font-medium bg-neutral-50 rounded-t-2xl divide-neutral-100 divide-x text-neutral-700">
+                <div class="flex-1 py-2 px-4">Тип продукта</div>
+                <div class="w-16 py-2 px-4"><i class="ri-delete-bin-fill"></i></div>
+                <div class="w-16 py-2 px-4"><i class="ri-thumb-down-fill"></i></div>
+            </div>
             {% for product in products %}
-                <tr>
-                    <td>{{ product.type }}</td>
-                    <td>{{ product.count_deleted }}</td>
-                    <td>{{ product.count_spoiled }}</td>
-                </tr>
+                <div class="flex items-center gap-2 bg-neutral-50 rounded-2xl">
+                    <div class="flex-1 py-1 px-4">{{ product.type }}</div>
+                    <div class="w-16 py-1 px-4">{{ product.count_deleted }}</div>
+                    <div class="w-16 py-1 px-4">{{ product.count_spoiled }}</div>
+                </div>
             {% endfor %}
-            </tbody>
-        </table>
-
-        <a href="/">Назад</a>
-    </div>
+        </div>
+    </main>
 {% endblock %}
