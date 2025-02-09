@@ -48,8 +48,10 @@
                 const id = {{ product.id|safe }}
                 fetch(`/api/storage/${id}`, {
                     method: 'DELETE'
-                })
-                    .catch(error => console.error('Ошибка:', error));
+                }).then(function(response){
+                  console.log("Success", response);
+                  window.location.href = '/';
+                }).catch(error => console.error('Ошибка:', error));
             }
         </script>
     </main>
