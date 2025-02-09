@@ -1,7 +1,7 @@
 from flask import jsonify
 from datetime import datetime, timedelta
 from app import COUNT_PAGE
-from app.bd.database import Storage, ShoppingListHistory, QR, Product
+from app.bd.database import Storage, ShoppingListHistory, QR
 
 
 def bd_get_storage_product(page):
@@ -89,24 +89,26 @@ def bd_get_product(id):
     Возвращает:
         dict: JSON-ответ с информацией о продукте.
     """
-    storage_product = Storage.get(Storage.id == str(id))
-    obj = QR.get(QR.id == str(storage_product.qr_product))
-    return {
-        'product': {
-            'id': obj.id,
-            'count': obj.count,
-            'name': obj.product.name,
-            'type': obj.product.type,
-            'price': obj.price,
-            'product_id': obj.product.id,
-            'measurement': obj.measurement,
-            'type_measurement': obj.type_measurement,
-            'produced_date': obj.produced_date,
-            'last_date': obj.last_date,
-            'allergic': obj.product.allergic
-        }
-    }
 
+    obj = QR.get_or_none(QR.id == str(id))
+    if obj:
+        return {
+            'product': {
+                'id': obj.id,
+                'count': obj.count,
+                'name': obj.product.name,
+                'type': obj.product.type,
+                'price': obj.price,
+                'product_id': obj.product.id,
+                'measurement': obj.measurement,
+                'type_measurement': obj.type_measurement,
+                'produced_date': obj.produced_date,
+                'last_date': obj.last_date,
+                'allergic': obj.product.allergic
+            }
+        }
+    else:
+        return None
 
 ##### Работа с БД ShoppingListHistory #####
 def bd_get_shopping_history():

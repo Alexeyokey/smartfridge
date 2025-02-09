@@ -77,9 +77,13 @@ def product(product_id):
     """
     product = bd_get_product(product_id)
     if product:
-        in_storage = Storage.get_or_none(Storage.id == product['product']['id'])
-        form = productquantityform.ProductOrder(product_id=product['product']['product_id'])   
-        return render_template('product.html', product=product['product'], form=form, save=not in_storage)
+        in_storage = Storage.get_or_none(Storage.qr_product == product['product']['id'])
+        form = productquantityform.ProductOrder(product_id=product['product']['product_id'])  
+
+        if in_storage:
+            return render_template('product.html', product=product['product'], form=form, save=not in_storage, storage_id=in_storage.id)
+        else:
+            return render_template('product.html', product=product['product'], form=form, save=not in_storage)
     else:
         return "Ошибка: Продукт не найден", 404
 

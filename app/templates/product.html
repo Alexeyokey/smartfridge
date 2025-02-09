@@ -31,6 +31,7 @@
             {% endif %}
             <div class="flex-1"></div>
         </div>
+        {% if not save %}
         <form method="POST" class="flex gap-4 sm:items-center justify-center max-sm:flex-col">
             {{ form.hidden_tag() }}
             {{ form.quantity(id="quantity", placeholder="Количество", class="placeholder-neutral-500 outline-none py-2 sm:w-32") }}
@@ -45,14 +46,37 @@
         </button>
         <script>
             function deleteProduct() {
-                const id = {{ product.id|safe }}
+                const id = "{{ storage_id|safe }}"; // Если id строка, используем кавычки
                 fetch(`/api/storage/${id}`, {
-                    method: 'DELETE'
-                }).then(function(response){
-                  console.log("Success", response);
-                  window.location.href = '/';
-                }).catch(error => console.error('Ошибка:', error));
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    console.log("Success", response);
+                    window.location.href = '/';
+                })
+                .catch(error => console.error('Ошибка:', error));
             }
-        </script>
+        </script>        
+        {% else %}
+        <button class="flex-1 text-white bg-green-500 rounded-2xl px-6 py-3 flex items-center justify-center gap-1"
+                    onclick="saveProduct()">
+                <i class="ri-save-fill"></i>
+                Сохранить продукт
+            </button>
+            <script>
+                function saveProduct() {
+                    const qrId = "{{ product.id|safe }}"
+                    fetch(`/api/add_qr_product_storage`, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ qr_id: qrId }),
+                        method: 'POST'
+                    })
+                        .then(() => location.href = '/')
+                        .catch(error => console.error('Ошибка:', error));
+                }
+            </script>
+        {% endif %}
     </main>
 {% endblock %}
