@@ -89,7 +89,8 @@ def bd_get_product(id):
     Возвращает:
         dict: JSON-ответ с информацией о продукте.
     """
-    obj = QR.get(QR.id == str(id))
+    storage_product = Storage.get(Storage.id == str(id))
+    obj = QR.get(QR.id == str(storage_product.qr_product))
     return {
         'product': {
             'id': obj.id,
