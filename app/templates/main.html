@@ -20,7 +20,7 @@
         <div class="flex flex-col gap-3 flex-1 overflow-auto">
             {% for row in table %}
                 {% if row.expired %}
-                    <a href="/product/{{ qr_id }}"
+                    <a href="/product/{{ row.qr_id }}"
                        class="bg-neutral-50 rounded-2xl p-4 flex justify-between items-center text-neutral-500">
                         <div class="flex items-start text-start flex-col">
                             <h3 class="font-medium capitalize text-lg line-through">{{ row.name }}</h3>
@@ -32,7 +32,7 @@
                         </div>
                     </a>
                 {% else %}
-                    <a href="/product/{{ qr_id }}"
+                    <a href="/product/{{ row.qr_id }}"
                        class="bg-neutral-50 rounded-2xl p-4 flex justify-between items-center">
                         <div class="flex items-start text-start flex-col">
                             <h3 class="font-medium capitalize text-lg">{{ row.name }}</h3>
