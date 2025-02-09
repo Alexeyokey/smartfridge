@@ -49,7 +49,7 @@
 1. Создайте виртуальное окружение:
  • Linux/macOS:
  ```sh
- python3 -m venv myenv
+ python3 -m venv venv
  ```
  • Windows:
  ```sh
