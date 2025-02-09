@@ -1,3 +1,8 @@
+# Видео-демонстрация проекта
+```https://rutube.ru/video/private/5259c214f17612b6b6e11642eda14a5e/?p=W8mS55NqKvbi8GE-UfyAVA```
+
+
+# Установка проекта:
 # Установка Node.js на Windows и macOS
 
 ## Установка на Windows
