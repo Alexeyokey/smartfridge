@@ -35,7 +35,7 @@ def send_notification():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_notification, 'interval', minutes=3)
+scheduler.add_job(send_notification, 'interval', minutes=1)
 scheduler.start()
 
 if __name__ == '__main__':
