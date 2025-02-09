@@ -9,9 +9,9 @@ class AddForm(FlaskForm):
     Args:
         FlaskForm (_type_): _description_
     """
-    name = StringField('Name', validators=[DataRequired()])
-    type = StringField('Type', validators=[DataRequired()])
-    calories = IntegerField('Calories', validators=[DataRequired()], render_kw={"placeholder": "Ккал"})
-    ingredients = TextAreaField('Ingredients', validators=[DataRequired()])
-    allergic = BooleanField('Allergic', validators=[Optional()])
-    submit = SubmitField('Add Product')
+    name = StringField('Название', validators=[DataRequired()])
+    type = StringField('Тип', validators=[DataRequired()])
+    calories = IntegerField('Калории', validators=[DataRequired()], render_kw={"placeholder": "Ккал"})
+    ingredients = TextAreaField('Ингредиенты', validators=[DataRequired()])
+    allergic = BooleanField('Аллергический', validators=[Optional()])
+    submit = SubmitField('Добавить продукт')

@@ -5,7 +5,8 @@ from wtforms.validators import DataRequired
 
 
 
-"""форма для заказа на закупку (количество)
+"""
+Форма для заказа на закупку (количество)
 """
 class ProductOrder(FlaskForm):
     quantity = IntegerField('Количество', validators=[DataRequired()], render_kw={"placeholder": "Штук"})

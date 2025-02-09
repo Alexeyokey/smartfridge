@@ -4,7 +4,8 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import Optional
 
 
-"""форма поисковой строки
+"""
+Форма поисковой строки
 """
 class SearchForm(FlaskForm):
     query = StringField('SEARCH', validators=[Optional()] )

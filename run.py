@@ -26,12 +26,16 @@ def send_notification():
     """Функция для отправки уведомления"""
     count = bd_expired_count()
     now = datetime.datetime.now().strftime('%H:%M:%S')
-    message = f"ИСПОРЧЕНО ПРОДУКТОВ: {count['count']} ПРОВЕДИТЕ РЕВИЗИЮ"
+
+    message = f"""ИСПОРЧЕНО ПРОДУКТОВ: {count['count']}
+СКОРО ИСПОРТЯТСЯ: {count['soon_count']}
+"""
+
     socketio.emit('notification', {'message': message})
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_notification, 'interval', minutes=5)
+scheduler.add_job(send_notification, 'interval', minutes=10)
 scheduler.start()
 
 if __name__ == '__main__':

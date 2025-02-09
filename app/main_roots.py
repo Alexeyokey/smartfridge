@@ -129,7 +129,7 @@ def add_product():
             Product.create(**data) 
             return redirect('/add_qr_product')  
         flash('Такой продукт уже есть в базе данных')
-    return render_template('add_product.html', form=form)  
+    return render_template('add_form.html', form=form)  
 
 # Страница для добавления нового QR-кода
 @main.route('/add_qr_product', methods=['GET', 'POST'])
@@ -145,8 +145,8 @@ def add_qr_product():
     if form.validate_on_submit(): 
         if form.last_date.data <= form.produced_date.data:
             flash('Неверные даты')
-            return render_template('add_qr_product.html', form=form)
-        if form.type_measurement.lower() == 'количество':
+            return render_template('add_form.html', form=form)
+        if form.type_measurement == 'количество':
             count = form.measurement
         data = form.data
         count = 1
@@ -154,7 +154,7 @@ def add_qr_product():
         qr_code = QR.create(**form.data)  
         get_qrcode(qr_code)  
         return render_template('qr_code.html', qr_id=qr_code.id, url_product=url_for('static', filename=f'qr_codes/qr_{qr_code.id}.png'))
-    return render_template('add_qr_product.html', form=form)  
+    return render_template('add_form.html', form=form)  
 
 
 @main.route('/shopping_list', methods=['GET'])
