@@ -30,6 +30,7 @@ def bd_get_storage_product(page):
         'products': [
             {
                 'id': obj.id,
+                'qr_id': obj.qr_product.id,
                 'name': obj.qr_product.product.name,
                 'calories': obj.qr_product.product.calories,
                 'type': obj.qr_product.product.type,
