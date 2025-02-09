@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/gh/schmich/instascan-builds@master/instascan.min.js"></script>
+    <main class="w-full max-w-xl mx-auto p-4 relative h-screen">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 absolute left-9 top-9 flex items-center justify-center z-10">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+        <div class="w-full h-full rounded-2xl overflow-hidden bg-neutral-50">
+            <video id="preview" class="w-full h-full object-cover">scan</video>
+        </div>
+        <button class="size-12 bg-green-500 rounded-full absolute left-1/2 bottom-12 -translate-x-1/2"></button>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+
+            scanner.addListener('scan', function (content) {
+                window.location.href = 'product/' + JSON.parse(content)['id']; // Автопереход на страницу
+            });
+
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    // Если доступна задняя камера, используем её
+                    let selectedCamera = cameras.find(cam => cam.name.toLowerCase().includes('back')) || cameras[0];
+                    scanner.start(selectedCamera);
+                } else {
+                    alert("Камера не найдена");
+                }
+            }).catch(function (e) {
+                console.error("Ошибка доступа к камере:", e);
+                alert("Ошибка доступа к камере: " + e.message);
+            });
+        });
+    </script>
+{% endblock %}

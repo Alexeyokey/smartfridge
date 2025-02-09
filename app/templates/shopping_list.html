@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <main class="p-4 flex flex-col gap-4 h-screen w-full max-w-xl mx-auto">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+        <div class="bg-neutral-50 p-4 flex flex-col gap-4 rounded-2xl flex-1 overflow-auto">
+            {% for product in products %}
+                <div class="flex items-center gap-2">
+                    <div class="font-medium capitalize">{{ product.name }}</div>
+                    <div class="text-green-500">x{{ product.quantity }}</div>
+                    <div class="flex-1"></div>
+                    <button onclick="deleteProduct('{{ product.id }}')">
+                        <i class="ri-delete-bin-fill"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            function deleteProduct(productId) {
+                fetch(`/api/shopping_list/${productId}`, {
+                    method: 'DELETE'
+                }).catch(error => console.error('Ошибка:', error));
+            }
+        </script>
+    </main>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <main class="w-full max-w-xl mx-auto p-4 relative h-screen flex flex-col gap-4">
+        <a href="/" class="rounded-full bg-neutral-50 size-9 flex items-center justify-center my-4">
+            <i class="ri-arrow-left-s-fill ri-xl"></i>
+        </a>
+        <form method="POST" class="bg-neutral-50 p-4 flex flex-col gap-4 rounded-2xl flex-1 overflow-auto">
+            {{ form.hidden_tag() }}
+            {% for field in form if field.name != 'csrf_token' and field.name != 'submit' %}
+                <label class="flex flex-col gap-1 items-start">
+                    <span class="text-neutral-700">{{ field.label }}</span>
+                    {{ field(class="text-2xl placeholder-neutral-500 outline-none w-full font-medium") }}
+                </label>
+            {% endfor %}
+            <div class="flex-1"></div>
+            <button class=" text-white bg-green-500 rounded-2xl px-6 py-3 flex items-center justify-center gap-1">
+                <i class="ri-save-fill"></i>
+                Сохранить
+            </button>
+        </form>
+    </main>
+{% endblock %}
